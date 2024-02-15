@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import {
-  Button,Chip,Grid,IconButton,InputAdornment,makeStyles,Paper,
-  TextField,Typography,Modal,Slider,FormControlLabel,FormGroup,MenuItem,Checkbox,
+  Button,Chip,Grid,makeStyles,Paper,
+  Typography,Modal,
 } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
@@ -213,8 +213,8 @@ const Applications = (props) => {
 
   useEffect(() => {
     getData();
-  }, []);
-
+  }, );
+//
   const getData = () => {
     axios
       .get(apiList.applications, {

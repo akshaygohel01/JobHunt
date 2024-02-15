@@ -16,7 +16,7 @@ import JobApplications from "./component/recruiter/JobApplications";
 import AcceptedApplicants from "./component/recruiter/AcceptedApplicants";
 import RecruiterProfile from "./component/recruiter/Profile";
 import MessagePopup from "./lib/MessagePopup";
-import isAuth, { userType } from "./lib/isAuth";
+import { userType } from "./lib/isAuth";
 
 const useStyles = makeStyles(
   (theme) => ({
@@ -33,7 +33,7 @@ const useStyles = makeStyles(
   }));
 
 export const SetPopupContext = createContext();
-const TITLE = "Job-o-Hunt"
+
 
 function App() {
   const classes = useStyles();

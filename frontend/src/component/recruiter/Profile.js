@@ -3,7 +3,7 @@ import {
   Button,
   Grid,
   Typography,
-  Modal,
+
   Paper,
   makeStyles,
   TextField,
@@ -50,8 +50,8 @@ const Profile = (props) => {
 
   useEffect(() => {
     getData();
-  }, []);
-
+  }, );
+//
   const getData = () => {
     axios
       .get(apiList.user, {

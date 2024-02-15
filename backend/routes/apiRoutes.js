@@ -176,6 +176,181 @@ router.get("/jobs", jwtAuth, (req, res) => {
   // .skip(skip)
   // .limit(limit)
 
+  let arr = [
+    {
+      $lookup: {
+        from: "recruiterinfos",
+        localField: "userId",
+        foreignField: "userId",
+        as: "recruiter",
+      },
+    },
+    { $unwind: "$recruiter" },
+    { $match: findParams },
+  ];
+
+  if (Object.keys(sortParams).length > 0) {
+    arr = [
+      {
+        $lookup: {
+          from: "recruiterinfos",
+          localField: "userId",
+          foreignField: "userId",
+          as: "recruiter",
+        },
+      },
+      { $unwind: "$recruiter" },
+      { $match: findParams },
+      {
+        $sort: sortParams,
+      },
+    ];
+  }
+
+  console.log(arr);
+
+  Job.aggregate(arr)
+    .then((posts) => {
+      if (posts == null) {
+        res.status(404).json({
+          message: "No job found",
+        });
+        return;
+      }
+      res.json(posts);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+});
+
+// to get info about a particular job
+router.get("/jobs/:id", jwtAuth, (req, res) => {
+  Job.findOne({ _id: req.params.id })
+    .then((job) => {
+      if (job == null) {
+        res.status(400).json({
+          message: "Job does not exist",
+        });
+        return;
+      }
+      res.json(job);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+});
+
+// to update info of a particular job
+router.put("/jobs/:id", jwtAuth, (req, res) => {
+  const user = req.user;
+  if (user.type != "recruiter") {
+    // 401- unauthorised
+    res.status(401).json({
+      message: "You don't have permissions to change the job details",
+    });
+    return;
+  }
+  Job.findOne({
+    _id: req.params.id,
+    userId: user.id,
+  })
+    .then((job) => {
+      if (job == null) {
+        // 404 - not found
+        res.status(404).json({
+          message: "Job does not exist",
+        });
+        return;
+      }
+      const data = req.body;
+      if (data.maxApplicants) {
+        job.maxApplicants = data.maxApplicants;
+      }
+      if (data.maxPositions) {
+        job.maxPositions = data.maxPositions;
+      }
+      if (data.deadline) {
+        job.deadline = data.deadline;
+      }
+      job
+        .save()
+        .then(() => {
+          res.json({
+            message: "Job details updated successfully",
+          });
+        })
+        .catch((err) => {
+          res.status(400).json(err);
+        });
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+});
+
+// to delete a job
+router.delete("/jobs/:id", jwtAuth, (req, res) => {
+  const user = req.user;
+  if (user.type != "recruiter") {
+    res.status(401).json({
+      message: "You don't have permissions to delete the job",
+    });
+    return;
+  }
+  Job.findOneAndDelete({
+    _id: req.params.id,
+    userId: user.id,
+  })
+    .then((job) => {
+      if (job === null) {
+        res.status(401).json({
+          message: "You don't have permissions to delete the job",
+        });
+        return;
+      }
+      res.json({
+        message: "Job deleted successfully",
+      });
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+});
+
+
+router.get("/user", jwtAuth, (req, res) => {
+  const user = req.user;
+  if (user.type === "recruiter") {
+    Recruiter.findOne({ userId: user._id })
+      .then((recruiter) => {
+        if (recruiter == null) {
+          res.status(404).json({
+            message: "User does not exist",
+          });
+          return;
+        }
+        res.json(recruiter);
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  } else {
+    JobApplicant.findOne({ userId: user._id })
+      .then((jobApplicant) => {
+        if (jobApplicant == null) {
+          res.status(404).json({
+            message: "User does not exist",
+          });
+          return;
+        }
+        res.json(jobApplicant);
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  }
+});
 
 
 router.get("/user/:id", jwtAuth, (req, res) => {

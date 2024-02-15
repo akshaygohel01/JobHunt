@@ -4,16 +4,16 @@ import {
   Chip,
   Grid,
   IconButton,
-  InputAdornment,
+ 
   makeStyles,
   Paper,
-  TextField,
+
   Typography,
   Modal,
-  Slider,
+
   FormControlLabel,
-  FormGroup,
-  MenuItem,
+
+
   Checkbox,
   Avatar,
 } from "@material-ui/core";
@@ -26,7 +26,7 @@ import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 
 import { SetPopupContext } from "../../App";
 
-import apiList, { server } from "../../lib/apiList";
+import apiList from "../../lib/apiList";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -666,8 +666,8 @@ const JobApplications = (props) => {
 
   useEffect(() => {
     getData();
-  }, []);
-
+  }, );
+//
   const getData = () => {
     let searchParams = [];
 

@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import {Grid,TextField,Button,Typography,makeStyles,Paper,MenuItem,Input,} from "@material-ui/core";
+import {Grid,TextField,Button,Typography,makeStyles,Paper,MenuItem,} from "@material-ui/core";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
 import ChipInput from "material-ui-chip-input";
@@ -421,13 +421,7 @@ const Signup = (props) => {
                 className={classes.inputBox}
                 label="Profile Photo (.jpg/.png)"
                 icon={<FaceIcon />}
-                // value={files.profileImage}
-                // onChange={(event) =>
-                //   setFiles({
-                //     ...files,
-                //     profileImage: event.target.files[0],
-                //   })
-                // }
+               
                 uploadTo={apiList.uploadProfileImage}
                 handleInput={handleInput}
                 identifier={"profile"}
@@ -447,7 +441,7 @@ const Signup = (props) => {
                 onChange={(event) => {
                   if (
                     event.target.value.split(" ").filter(function (n) {
-                      return n != "";
+                      return n !== "";
                     }).length <= 250
                   ) {
                     handleInput("bio", event.target.value);

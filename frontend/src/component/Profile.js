@@ -1,9 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { useContext, useEffect, useState } from "react";
 import {
   Button,
   Grid,
   Typography,
-  Modal,
   Paper,
   makeStyles,
   TextField,
@@ -17,7 +17,7 @@ import FaceIcon from "@material-ui/icons/Face";
 
 import { SetPopupContext } from "../App";
 
-import apiList, {server} from "../lib/apiList";
+import apiList ,{server} from "../lib/apiList";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -140,8 +140,8 @@ const Profile = (props) => {
 
   useEffect(() => {
     getData();
-  }, []);
-
+  }, );
+  //
   const getData = () => {
     axios
       .get(apiList.user, {
@@ -173,6 +173,24 @@ const Profile = (props) => {
   };
 
    
+  const getResume= ()=>{
+    const address = `${profileDetails.resume}`;
+    console.log(address)
+    if(address!=="")
+    {
+      window.open(address)
+      // console.log(error);
+        
+    }else{
+      setPopup({
+        open: true,
+        severity: "error",
+        message: "You have not uploaded any resume. Upload one to view!",
+      });
+    }
+    
+  
+  }
 
 
   const handleClose = () => {
@@ -223,6 +241,134 @@ const Profile = (props) => {
     setOpen(false);
   };
   
-
+  return (
+    <>
+      <Grid
+        container
+        item
+        direction="column"
+        alignItems="center"
+        style={{ padding: "30px", minHeight: "93vh" }}
+      >
+        
+        <Grid item xs>
+          <Paper
+            style={{
+              padding: "20px",
+              outline: "none",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Grid
+                container direction="column" alignItems="center" 
+                xs={2}
+                style={{
+                  display:"center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  float:"left",
+                }}
+              >
+                <Avatar
+                  src={`${profileDetails.profile}`}
+                  className={classes.avatar}
+                  
+                />
+                <Typography variant="h3" component="h2" style={{color:"#3f51b5",fontWeight:"bold"}}>
+                Profile
+                </Typography>
+              </Grid>
+            <Grid container direction="column" alignItems="" spacing={3}>
+            
+        
+            
+              <Grid item>
+                <TextField
+                  label="Name"
+                  value={profileDetails.name}
+                  onChange={(event) => handleInput("name", event.target.value)}
+                  className={classes.inputBox}
+                  variant="outlined"
+                  fullWidth
+                />
+              </Grid>
+              <MultifieldInput
+                education={education}
+                setEducation={setEducation}
+              />
+              <Grid item>
+                <ChipInput
+                  className={classes.inputBox}
+                  label="Skills"
+                  variant="outlined"
+                  helperText="Press enter to add skills"
+                  value={profileDetails.skills}
+                  onAdd={(chip) =>
+                    setProfileDetails({
+                      ...profileDetails,
+                      skills: [...profileDetails.skills, chip],
+                    })
+                  }
+                  onDelete={(chip, index) => {
+                    let skills = profileDetails.skills;
+                    skills.splice(index, 1);
+                    setProfileDetails({
+                      ...profileDetails,
+                      skills: skills,
+                    });
+                  }}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <FileUploadInput
+                  className={classes.inputBox}
+                  label="Resume (Images only)"
+                  icon={<DescriptionIcon />}
+                  uploadTo={apiList.uploadResume}
+                  handleInput={handleInput}
+                  identifier={"resume"}
+                />
+              </Grid>
+              <Grid item>
+              <Button
+                variant="contained"
+                className={classes.statusBlock}
+                color="primary"
+                onClick={() => getResume()}
+                style={{alignItems:"center"}}
+              >
+                View Uploaded Resume
+              </Button>
+              </Grid>
+              <Grid item>
+                <FileUploadInput
+                  className={classes.inputBox}
+                  label="Profile Photo (.jpg/.png)"
+                  icon={<FaceIcon />}
+                  uploadTo={apiList.uploadProfileImage}
+                  handleInput={handleInput}
+                  identifier={"profile"}
+                />
+              </Grid>
+              
+            </Grid>
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ padding: "10px 50px", marginTop: "30px",borderRadius:"8px",height:"50px"}}
+              onClick={() => handleUpdate()}
+            >
+              Update Details
+            </Button>
+          </Paper>
+        </Grid>
+      </Grid>
+    </>
+  );
+};
 
 export default Profile;
