@@ -12,13 +12,13 @@ import {
   Modal,
   Slider,
   FormControlLabel,
-
+  FormGroup,
   MenuItem,
   Checkbox,
 } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import Rating from "@material-ui/lab/Rating";
-// import Pagination from "@material-ui/lab/Pagination";
+import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
 import SearchIcon from "@material-ui/icons/Search";
 import FilterListIcon from "@material-ui/icons/FilterList";
@@ -371,7 +371,7 @@ const FilterPopup = (props) => {
               item
               xs={9}
               justify="space-around"
-              // alignItems="center"
+            // alignItems="center"
             >
               <Grid item>
                 <FormControlLabel
@@ -711,8 +711,8 @@ const MyJobs = (props) => {
   const setPopup = useContext(SetPopupContext);
   useEffect(() => {
     getData();
-  }, );
-//
+  }, []);
+
   const getData = () => {
     let searchParams = [`myjobs=1`];
     if (searchOptions.query !== "") {
@@ -727,19 +727,19 @@ const MyJobs = (props) => {
     if (searchOptions.jobType.wfh) {
       searchParams = [...searchParams, `jobType=Work%20From%20Home`];
     }
-    if (searchOptions.salary[0] !== 0) {
+    if (searchOptions.salary[0] != 0) {
       searchParams = [
         ...searchParams,
         `salaryMin=${searchOptions.salary[0] * 1000}`,
       ];
     }
-    if (searchOptions.salary[1] !== 100) {
+    if (searchOptions.salary[1] != 100) {
       searchParams = [
         ...searchParams,
         `salaryMax=${searchOptions.salary[1] * 1000}`,
       ];
     }
-    if (searchOptions.duration !== "0") {
+    if (searchOptions.duration != "0") {
       searchParams = [...searchParams, `duration=${searchOptions.duration}`];
     }
 
@@ -802,7 +802,7 @@ const MyJobs = (props) => {
           alignItems="center"
         >
           <Grid item xs>
-            <Typography variant="h2" style={{color:"white",fontWeight:"bold"}}>My Jobs</Typography>
+            <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>My Jobs</Typography>
           </Grid>
           <Grid item xs>
             <TextField
@@ -828,7 +828,7 @@ const MyJobs = (props) => {
                   </InputAdornment>
                 ),
               }}
-              style={{ width: "500px",backgroundColor:"white", borderRadius:"12px"}}
+              style={{ width: "500px", backgroundColor: "white", borderRadius: "12px" }}
               variant="outlined"
             />
           </Grid>
@@ -852,8 +852,10 @@ const MyJobs = (props) => {
               return <JobTile job={job} getData={getData} />;
             })
           ) : (
-            <Typography variant="h5" style={{height:"50px", textAlign: "center",
-            background:"rgba(255,255,255,0.5)",marginLeft:"25%",marginRight:"25%",paddingTop:"15px" }}>
+            <Typography variant="h5" style={{
+              height: "50px", textAlign: "center",
+              background: "rgba(255,255,255,0.5)", marginLeft: "25%", marginRight: "25%", paddingTop: "15px"
+            }}>
               No jobs found
             </Typography>
           )}

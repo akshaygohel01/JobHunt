@@ -30,8 +30,7 @@ const Navbar = (props) => {
   return (
     <AppBar position="fixed" background="transparent">
       <Toolbar style={{ minHeight: "80px" }}>
-        <Typography variant="h6" className={classes.title} style={{ fontSize: "32px", fontWeight: "800" }}>
-          JOB HUNT
+        <Typography variant="h6" className={classes.title} style={{ fontSize: "32px", fontWeight: "800" }}>JOB HUNT
         </Typography>
         <div style={{ marginTop: "20px" }}>
           {isAuth() ? (
@@ -47,7 +46,12 @@ const Navbar = (props) => {
                 <Button color="inherit" onClick={() => handleClick("/myjobs")}>
                   <Typography style={{ fontSize: "18px" }}>Posted</Typography>
                 </Button>
-                
+                <Button color="inherit" onClick={() => handleClick("/employees")}>
+                  <Typography style={{ fontSize: "18px" }}>Employees</Typography>
+                </Button>
+                <Button color="inherit" onClick={() => handleClick("/profile")}>
+                  <Typography style={{ fontSize: "18px" }}>Profile</Typography>
+                </Button>
                 <Button color="inherit" onClick={() => handleClick("/logout")}>
                   <Typography style={{ fontSize: "18px" }}>Logout</Typography>
                 </Button>
@@ -57,7 +61,12 @@ const Navbar = (props) => {
                 <Button color="inherit" onClick={() => handleClick("/home")}>
                   <Typography style={{ fontSize: "18px" }}>Home</Typography>
                 </Button>
-               
+                <Button
+                  color="inherit"
+                  onClick={() => handleClick("/applications")}
+                >
+                  <Typography style={{ fontSize: "18px" }}>Applied</Typography>
+                </Button>
                 <Button color="inherit" onClick={() => handleClick("/profile")}>
                   <Typography style={{ fontSize: "18px" }}>Profile</Typography>
                 </Button>

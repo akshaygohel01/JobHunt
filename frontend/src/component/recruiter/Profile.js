@@ -3,7 +3,7 @@ import {
   Button,
   Grid,
   Typography,
-
+  Modal,
   Paper,
   makeStyles,
   TextField,
@@ -50,8 +50,8 @@ const Profile = (props) => {
 
   useEffect(() => {
     getData();
-  }, );
-//
+  }, []);
+
   const getData = () => {
     axios
       .get(apiList.user, {
@@ -123,7 +123,7 @@ const Profile = (props) => {
         alignItems="center"
         style={{ padding: "30px", minHeight: "93vh" }}
       >
-        
+
         <Grid item xs style={{ width: "100%" }}>
           <Paper
             style={{
@@ -137,11 +137,11 @@ const Profile = (props) => {
             }}
           >
             <Grid container direction="column" alignItems="stretch" spacing={3}>
-            <Grid item >
-              <Typography variant="h3" component="h2" style={{color:"#3f51b5",fontWeight:"bold"}}>
-                Profile
-              </Typography>
-            </Grid>
+              <Grid item >
+                <Typography variant="h3" component="h2" style={{ color: "#3f51b5", fontWeight: "bold" }}>
+                  Profile
+                </Typography>
+              </Grid>
               <Grid item>
                 <TextField
                   label="Name"
@@ -164,7 +164,7 @@ const Profile = (props) => {
                   onChange={(event) => {
                     if (
                       event.target.value.split(" ").filter(function (n) {
-                        return n !=="";
+                        return n != "";
                       }).length <= 250
                     ) {
                       handleInput("bio", event.target.value);

@@ -13,9 +13,7 @@ const Logout = (props) => {
       severity: "success",
       message: "Logged out successfully",
     });
-  }, );
-//
-
+  }, []);
   return <Redirect to="/login" />;
 };
 

@@ -4,17 +4,20 @@ import {
   Chip,
   Grid,
   IconButton,
-
+  InputAdornment,
   makeStyles,
   Paper,
-
+  TextField,
   Typography,
   Modal,
-  
+  Slider,
+  FormControlLabel,
+  FormGroup,
+  MenuItem,
   Checkbox,
   Avatar,
 } from "@material-ui/core";
-// import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
 import FilterListIcon from "@material-ui/icons/FilterList";
@@ -23,7 +26,7 @@ import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 
 import { SetPopupContext } from "../../App";
 
-import apiList from "../../lib/apiList";
+import apiList, { server } from "../../lib/apiList";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -68,7 +71,7 @@ const FilterPopup = (props) => {
         }}
       >
         <Grid container direction="column" alignItems="center" spacing={3}>
-          {}
+          { }
           <Grid container item alignItems="center">
             <Grid item xs={3}>
               Sort
@@ -372,15 +375,15 @@ const ApplicationTile = (props) => {
     setOpenEndJob(false);
   };
 
-  // const colorSet = {
-  //   applied: "#3454D1",
-  //   shortlisted: "#DC851F",
-  //   accepted: "#09BC8A",
-  //   rejected: "#D1345B",
-  //   deleted: "#B49A67",
-  //   cancelled: "#FF8484",
-  //   finished: "#4EA5D9",
-  // };
+  const colorSet = {
+    applied: "#3454D1",
+    shortlisted: "#DC851F",
+    accepted: "#09BC8A",
+    rejected: "#D1345B",
+    deleted: "#B49A67",
+    cancelled: "#FF8484",
+    finished: "#4EA5D9",
+  };
 
   const getResume = () => {
     if (
@@ -390,7 +393,23 @@ const ApplicationTile = (props) => {
       const address = `${application.jobApplicant.resume}`;
       console.log(address);
       window.open(address)
-
+      // axios(address, {
+      //   method: "GET",
+      //   responseType: "blob",
+      // })
+      //   .then((response) => {
+      //     const file = new Blob([response.data], { type: "application/pdf" });
+      //     const fileURL = URL.createObjectURL(file);
+      //     window.open(fileURL);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //     setPopup({
+      //       open: true,
+      //       severity: "error",
+      //       message: "Error",
+      //     });
+      //   });
     } else {
       setPopup({
         open: true,
@@ -624,8 +643,8 @@ const AcceptedApplicants = (props) => {
 
   useEffect(() => {
     getData();
-  }, );
-//
+  }, []);
+
   const getData = () => {
     let searchParams = [];
     searchParams = [...searchParams, `status=accepted`];
@@ -686,7 +705,7 @@ const AcceptedApplicants = (props) => {
         style={{ padding: "30px", minHeight: "93vh" }}
       >
         <Grid item>
-          <Typography variant="h2" style={{color:"white",fontWeight:"bold"}}>Employees</Typography>
+          <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>Employees</Typography>
         </Grid>
         <Grid item>
           <IconButton onClick={() => setFilterOpen(true)}>
@@ -710,8 +729,10 @@ const AcceptedApplicants = (props) => {
               </Grid>
             ))
           ) : (
-            <Typography variant="h5" style={{ height:"50px", textAlign: "center",
-            background:"rgba(255,255,255,0.5)",marginLeft:"25%",marginRight:"25%",paddingTop:"15px"}}>
+            <Typography variant="h5" style={{
+              height: "50px", textAlign: "center",
+              background: "rgba(255,255,255,0.5)", marginLeft: "25%", marginRight: "25%", paddingTop: "15px"
+            }}>
               No Applications Found
             </Typography>
           )}

@@ -1,9 +1,9 @@
-import { useContext,  useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Button,
   Grid,
   Typography,
-
+  Modal,
   Paper,
   makeStyles,
   TextField,
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-   
+    // padding: "30px",
   },
 }));
 
@@ -100,7 +100,7 @@ const CreateJobs = (props) => {
         style={{ padding: "30px", minHeight: "93vh", width: "50%" }}
       >
         <Grid item>
-          <Typography variant="h2" style={{color:"white",fontWeight:"bold"}}>Add Job</Typography>
+          <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>Add Job</Typography>
         </Grid>
         <Grid item container xs direction="column" justify="center">
           <Grid item>

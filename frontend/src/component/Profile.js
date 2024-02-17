@@ -1,9 +1,9 @@
-/* eslint-disable no-unused-vars */
 import { useContext, useEffect, useState } from "react";
 import {
   Button,
   Grid,
   Typography,
+  Modal,
   Paper,
   makeStyles,
   TextField,
@@ -17,7 +17,7 @@ import FaceIcon from "@material-ui/icons/Face";
 
 import { SetPopupContext } from "../App";
 
-import apiList ,{server} from "../lib/apiList";
+import apiList, { server } from "../lib/apiList";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     // padding: "30px",
   },
   avatar: {
-    alignSelf:"center",
+    alignSelf: "center",
     width: theme.spacing(17),
     height: theme.spacing(17),
   },
@@ -140,8 +140,8 @@ const Profile = (props) => {
 
   useEffect(() => {
     getData();
-  }, );
-  //
+  }, []);
+
   const getData = () => {
     axios
       .get(apiList.user, {
@@ -172,24 +172,39 @@ const Profile = (props) => {
       });
   };
 
-   
-  const getResume= ()=>{
+
+  const getResume = () => {
     const address = `${profileDetails.resume}`;
     console.log(address)
-    if(address!=="")
-    {
+    if (address !== "") {
       window.open(address)
       // console.log(error);
-        
-    }else{
+
+    } else {
       setPopup({
         open: true,
         severity: "error",
         message: "You have not uploaded any resume. Upload one to view!",
       });
     }
-    
-  
+
+    // axios(address, {
+    //   method: "GET",
+    //   responseType: "blob",
+    // })
+    //   .then((response) => {
+    //     const file = new Blob([response.data], { type: "application/pdf" });
+    //     const fileURL = URL.createObjectURL(file);
+    //     window.open(fileURL);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     setPopup({
+    //       open: true,
+    //       severity: "error",
+    //       message: "You have not uploaded any resume. Upload one to view!",
+    //     });
+    //   });
   }
 
 
@@ -240,7 +255,7 @@ const Profile = (props) => {
       });
     setOpen(false);
   };
-  
+
   return (
     <>
       <Grid
@@ -250,7 +265,7 @@ const Profile = (props) => {
         alignItems="center"
         style={{ padding: "30px", minHeight: "93vh" }}
       >
-        
+
         <Grid item xs>
           <Paper
             style={{
@@ -263,28 +278,30 @@ const Profile = (props) => {
             }}
           >
             <Grid
-                container direction="column" alignItems="center" 
-                xs={2}
-                style={{
-                  display:"center",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  float:"left",
-                }}
-              >
-                <Avatar
-                  src={`${profileDetails.profile}`}
-                  className={classes.avatar}
-                  
-                />
-                <Typography variant="h3" component="h2" style={{color:"#3f51b5",fontWeight:"bold"}}>
+              container direction="column" alignItems="center"
+              xs={2}
+              style={{
+                display: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                float: "left",
+              }}
+            >
+              <Avatar
+                src={`${profileDetails.profile}`}
+                className={classes.avatar}
+
+              />
+              <Typography variant="h3" component="h2" style={{ color: "#3f51b5", fontWeight: "bold" }}>
                 Profile
-                </Typography>
-              </Grid>
+              </Typography>
+            </Grid>
             <Grid container direction="column" alignItems="" spacing={3}>
-            
-        
-            
+
+              {/* <Grid item >
+              
+            </Grid> */}
+
               <Grid item>
                 <TextField
                   label="Name"
@@ -334,15 +351,15 @@ const Profile = (props) => {
                 />
               </Grid>
               <Grid item>
-              <Button
-                variant="contained"
-                className={classes.statusBlock}
-                color="primary"
-                onClick={() => getResume()}
-                style={{alignItems:"center"}}
-              >
-                View Uploaded Resume
-              </Button>
+                <Button
+                  variant="contained"
+                  className={classes.statusBlock}
+                  color="primary"
+                  onClick={() => getResume()}
+                  style={{ alignItems: "center" }}
+                >
+                  View Uploaded Resume
+                </Button>
               </Grid>
               <Grid item>
                 <FileUploadInput
@@ -354,12 +371,12 @@ const Profile = (props) => {
                   identifier={"profile"}
                 />
               </Grid>
-              
+
             </Grid>
             <Button
               variant="contained"
               color="primary"
-              style={{ padding: "10px 50px", marginTop: "30px",borderRadius:"8px",height:"50px"}}
+              style={{ padding: "10px 50px", marginTop: "30px", borderRadius: "8px", height: "50px" }}
               onClick={() => handleUpdate()}
             >
               Update Details

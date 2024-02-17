@@ -4,16 +4,16 @@ import {
   Chip,
   Grid,
   IconButton,
- 
+  InputAdornment,
   makeStyles,
   Paper,
-
+  TextField,
   Typography,
   Modal,
-
+  Slider,
   FormControlLabel,
-
-
+  FormGroup,
+  MenuItem,
   Checkbox,
   Avatar,
 } from "@material-ui/core";
@@ -26,7 +26,7 @@ import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 
 import { SetPopupContext } from "../../App";
 
-import apiList from "../../lib/apiList";
+import apiList, { server } from "../../lib/apiList";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -80,7 +80,7 @@ const FilterPopup = (props) => {
               item
               xs={9}
               justify="space-around"
-              // alignItems="center"
+            // alignItems="center"
             >
               <Grid item>
                 <FormControlLabel
@@ -580,9 +580,8 @@ const ApplicationTile = (props) => {
             Education:{" "}
             {application.jobApplicant.education
               .map((edu) => {
-                return `${edu.institutionName} (${edu.startYear}-${
-                  edu.endYear ? edu.endYear : "Ongoing"
-                })`;
+                return `${edu.institutionName} (${edu.startYear}-${edu.endYear ? edu.endYear : "Ongoing"
+                  })`;
               })
               .join(", ")}
           </Grid>
@@ -627,7 +626,7 @@ const ApplicationTile = (props) => {
             variant="contained"
             color="primary"
             style={{ padding: "10px 50px" }}
-            // onClick={() => changeRating()}
+          // onClick={() => changeRating()}
           >
             Submit
           </Button>
@@ -666,8 +665,8 @@ const JobApplications = (props) => {
 
   useEffect(() => {
     getData();
-  }, );
-//
+  }, []);
+
   const getData = () => {
     let searchParams = [];
 
@@ -736,7 +735,7 @@ const JobApplications = (props) => {
         style={{ padding: "30px", minHeight: "93vh" }}
       >
         <Grid item>
-          <Typography variant="h2" style={{color:"white",fontWeight:"bold"}}>Applications</Typography>
+          <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>Applications</Typography>
         </Grid>
         <Grid item>
           <IconButton onClick={() => setFilterOpen(true)}>
@@ -760,8 +759,10 @@ const JobApplications = (props) => {
               </Grid>
             ))
           ) : (
-            <Typography variant="h5" style={{height:"50px", textAlign: "center",
-            background:"rgba(255,255,255,0.5)",marginLeft:"25%",marginRight:"25%",paddingTop:"15px" }}>
+            <Typography variant="h5" style={{
+              height: "50px", textAlign: "center",
+              background: "rgba(255,255,255,0.5)", marginLeft: "25%", marginRight: "25%", paddingTop: "15px"
+            }}>
               No Applications Found
             </Typography>
           )}

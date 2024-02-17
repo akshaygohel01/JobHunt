@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import {Grid,TextField,Button,Typography,makeStyles,Paper,MenuItem,} from "@material-ui/core";
+import { Grid, TextField, Button, Typography, makeStyles, Paper, MenuItem, Input, } from "@material-ui/core";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
 import ChipInput from "material-ui-chip-input";
@@ -317,7 +317,7 @@ const Signup = (props) => {
     <Paper elevation={3} className={classes.body}>
       <Grid container direction="column" spacing={4} alignItems="center">
         <Grid item>
-          <Typography variant="h3" component="h2" style={{color:"#3f51b5",fontWeight:"bold"}}>
+          <Typography variant="h3" component="h2" style={{ color: "#3f51b5", fontWeight: "bold" }}>
             Sign up
           </Typography>
         </Grid>
@@ -421,7 +421,13 @@ const Signup = (props) => {
                 className={classes.inputBox}
                 label="Profile Photo (.jpg/.png)"
                 icon={<FaceIcon />}
-               
+                // value={files.profileImage}
+                // onChange={(event) =>
+                //   setFiles({
+                //     ...files,
+                //     profileImage: event.target.files[0],
+                //   })
+                // }
                 uploadTo={apiList.uploadProfileImage}
                 handleInput={handleInput}
                 identifier={"profile"}
@@ -441,7 +447,7 @@ const Signup = (props) => {
                 onChange={(event) => {
                   if (
                     event.target.value.split(" ").filter(function (n) {
-                      return n !== "";
+                      return n != "";
                     }).length <= 250
                   ) {
                     handleInput("bio", event.target.value);
@@ -469,11 +475,11 @@ const Signup = (props) => {
                 : handleLoginRecruiter();
             }}
             className={classes.submitButton}
-            style={{borderRadius:"8px",width:"130px",height:"50px"}}
+            style={{ borderRadius: "8px", width: "130px", height: "50px" }}
           >
             Signup
           </Button>
-          
+
         </Grid>
       </Grid>
     </Paper>
@@ -481,5 +487,4 @@ const Signup = (props) => {
 };
 
 export default Signup;
-
 
