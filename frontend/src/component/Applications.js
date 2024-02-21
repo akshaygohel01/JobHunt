@@ -123,6 +123,7 @@ const ApplicationTile = (props) => {
           <Grid item>
             <Typography variant="h5">{application.job.title}</Typography>
           </Grid>
+          <Grid item>Company : {application.job.companyName}</Grid>
           <Grid item>Posted By: {application.recruiter.name}</Grid>
           <Grid item>Role : {application.job.jobType}</Grid>
           <Grid item>Salary : &#8377; {application.job.salary} per month</Grid>
@@ -133,6 +134,7 @@ const ApplicationTile = (props) => {
               : `Flexible`}
           </Grid>
           <Grid item>
+            Skills Required:
             {application.job.skillsets.map((skill) => (
               <Chip label={skill} style={{ marginRight: "2px" }} />
             ))}

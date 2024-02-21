@@ -40,6 +40,8 @@ router.post("/jobs", jwtAuth, (req, res) => {
     duration: data.duration,
     salary: data.salary,
     rating: data.rating,
+    companyName: data.companyName,
+    responsibility: data.responsibility,
   });
 
   job
