@@ -131,6 +131,7 @@ const Signup = (props) => {
     profile: "",
     bio: "",
     contactNumber: "",
+    verificationDocument: "",
   });
 
   const [phone, setPhone] = useState("");
@@ -257,6 +258,7 @@ const Signup = (props) => {
   //changes made
   const handleVerificationDocumentUpload = (file) => {
     setVerificationDocument(file);
+    setSignupDetails({...signupDetails, verificationDocument:file.name})
     setVerificationDocumentName(file.name);
   };
 
@@ -553,7 +555,7 @@ const Signup = (props) => {
                 label="Verification Document (.jpg/.png)"
                 icon={<DescriptionIcon />}
                 uploadTo={apiList.uploadVerificationDocument} // Adjust API endpoint accordingly
-                handleInput={handleVerificationDocumentUpload}
+                handleInput={handleInput}
                 identifier={"verificationDocument"}
               />
             </Grid>
