@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
-import "../index.css"
+import "../index.css";
 
 import PasswordInput from "../lib/PasswordInput";
 import EmailInput from "../lib/EmailInput";
@@ -108,16 +108,18 @@ const Login = (props) => {
   return loggedin ? (
     <Redirect to="/" />
   ) : (
-    <Grid container direction="row" >
-      <div style={{ alignItems: "center", marginLeft: "15%", marginTop: "" }}>
-       
-      </div>
+    <Grid container direction="row">
+      <div
+        style={{ alignItems: "center", marginLeft: "15%", marginTop: "" }}
+      ></div>
       <Paper elevation={3} className={classes.body}>
-
         <Grid container direction="column" spacing={4} alignItems="center">
-
           <Grid item>
-            <Typography variant="h3" component="h2" style={{ color: "#3f51b5", fontWeight: "bold" }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              style={{ color: "#3f51b5", fontWeight: "bold" }}
+            >
               Welcome back, Login!
             </Typography>
           </Grid>

@@ -1,5 +1,14 @@
 import { useState, useContext } from "react";
-import { Grid, TextField, Button, Typography, makeStyles, Paper, MenuItem, Input, } from "@material-ui/core";
+import {
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  makeStyles,
+  Paper,
+  MenuItem,
+  Input,
+} from "@material-ui/core";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
 import ChipInput from "material-ui-chip-input";
@@ -155,6 +164,10 @@ const Signup = (props) => {
     },
   });
 
+  // Existing state variables...
+  const [verificationDocument, setVerificationDocument] = useState(null);
+  const [verificationDocumentName, setVerificationDocumentName] = useState("");
+
   const handleInput = (key, value) => {
     setSignupDetails({
       ...signupDetails,
@@ -241,6 +254,14 @@ const Signup = (props) => {
     }
   };
 
+  //changes made
+  const handleVerificationDocumentUpload = (file) => {
+    setVerificationDocument(file);
+    setVerificationDocumentName(file.name);
+  };
+
+
+
   const handleLoginRecruiter = () => {
     const tmpErrorHandler = {};
     Object.keys(inputErrorHandler).forEach((obj) => {
@@ -311,13 +332,77 @@ const Signup = (props) => {
     }
   };
 
+  const handleLoginAdmin = () => {
+    const tmpErrorHandler = {};
+    Object.keys(inputErrorHandler).forEach((obj) => {
+      if (inputErrorHandler[obj].required && inputErrorHandler[obj].untouched) {
+        tmpErrorHandler[obj] = {
+          required: true,
+          untouched: false,
+          error: true,
+          message: `${obj[0].toUpperCase() + obj.substr(1)} is required`,
+        };
+      } else {
+        tmpErrorHandler[obj] = inputErrorHandler[obj];
+      }
+    });
+
+    let updatedDetails = {
+      ...signupDetails,
+      // Add any additional admin-specific details if needed
+    };
+
+    setSignupDetails(updatedDetails);
+
+    const verified = !Object.keys(tmpErrorHandler).some((obj) => {
+      return tmpErrorHandler[obj].error;
+    });
+
+    console.log(updatedDetails);
+
+    if (verified) {
+      axios
+        .post(apiList.signup, updatedDetails)
+        .then((response) => {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("type", response.data.type);
+          setLoggedin(isAuth());
+          setPopup({
+            open: true,
+            severity: "success",
+            message: "Logged in successfully",
+          });
+          console.log(response);
+        })
+        .catch((err) => {
+          setPopup({
+            open: true,
+            severity: "error",
+            message: err.response.data.message,
+          });
+          console.log(err.response);
+        });
+    } else {
+      setInputErrorHandler(tmpErrorHandler);
+      setPopup({
+        open: true,
+        severity: "error",
+        message: "Incorrect Input",
+      });
+    }
+  };
+
   return loggedin ? (
     <Redirect to="/" />
   ) : (
     <Paper elevation={3} className={classes.body}>
       <Grid container direction="column" spacing={4} alignItems="center">
         <Grid item>
-          <Typography variant="h3" component="h2" style={{ color: "#3f51b5", fontWeight: "bold" }}>
+          <Typography
+            variant="h3"
+            component="h2"
+            style={{ color: "#3f51b5", fontWeight: "bold" }}
+          >
             Sign up
           </Typography>
         </Grid>
@@ -334,11 +419,16 @@ const Signup = (props) => {
           >
             <MenuItem value="applicant">Applicant</MenuItem>
             <MenuItem value="recruiter">Recruiter</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
           </TextField>
         </Grid>
         <Grid item>
           <TextField
-            label="Name"
+            label={
+              <>
+                Name<span style={{ color: "red" }}>*</span>
+              </>
+            }
             value={signupDetails.name}
             onChange={(event) => handleInput("name", event.target.value)}
             className={classes.inputBox}
@@ -356,7 +446,11 @@ const Signup = (props) => {
         </Grid>
         <Grid item>
           <EmailInput
-            label="Email"
+            label={
+              <>
+                Email<span style={{ color: "red" }}>*</span>
+              </>
+            }
             value={signupDetails.email}
             onChange={(event) => handleInput("email", event.target.value)}
             inputErrorHandler={inputErrorHandler}
@@ -367,7 +461,11 @@ const Signup = (props) => {
         </Grid>
         <Grid item>
           <PasswordInput
-            label="Password"
+            label={
+              <>
+                Password<span style={{ color: "red" }}>*</span>
+              </>
+            }
             value={signupDetails.password}
             onChange={(event) => handleInput("password", event.target.value)}
             className={classes.inputBox}
@@ -404,13 +502,6 @@ const Signup = (props) => {
                 className={classes.inputBox}
                 label="Resume (Images only)"
                 icon={<DescriptionIcon />}
-                // value={files.resume}
-                // onChange={(event) =>
-                //   setFiles({
-                //     ...files,
-                //     resume: event.target.files[0],
-                //   })
-                // }
                 uploadTo={apiList.uploadResume}
                 handleInput={handleInput}
                 identifier={"resume"}
@@ -421,20 +512,13 @@ const Signup = (props) => {
                 className={classes.inputBox}
                 label="Profile Photo (.jpg/.png)"
                 icon={<FaceIcon />}
-                // value={files.profileImage}
-                // onChange={(event) =>
-                //   setFiles({
-                //     ...files,
-                //     profileImage: event.target.files[0],
-                //   })
-                // }
                 uploadTo={apiList.uploadProfileImage}
                 handleInput={handleInput}
                 identifier={"profile"}
               />
             </Grid>
           </>
-        ) : (
+        ) : signupDetails.type === "recruiter" ? (
           <>
             <Grid item style={{ width: "100%" }}>
               <TextField
@@ -462,8 +546,19 @@ const Signup = (props) => {
                 onChange={(phone) => setPhone(phone)}
               />
             </Grid>
+
+            <Grid item>
+              <FileUploadInput
+                className={classes.inputBox}
+                label="Verification Document (.jpg/.png)"
+                icon={<DescriptionIcon />}
+                uploadTo={apiList.uploadVerificationDocument} // Adjust API endpoint accordingly
+                handleInput={handleVerificationDocumentUpload}
+                identifier={"verificationDocument"}
+              />
+            </Grid>
           </>
-        )}
+        ) : null}
 
         <Grid item>
           <Button
@@ -472,14 +567,15 @@ const Signup = (props) => {
             onClick={() => {
               signupDetails.type === "applicant"
                 ? handleLogin()
-                : handleLoginRecruiter();
+                : signupDetails.type === "recruiter"
+                ? handleLoginRecruiter()
+                : handleLoginAdmin();
             }}
             className={classes.submitButton}
             style={{ borderRadius: "8px", width: "130px", height: "50px" }}
           >
             Signup
           </Button>
-
         </Grid>
       </Grid>
     </Paper>
@@ -487,4 +583,3 @@ const Signup = (props) => {
 };
 
 export default Signup;
-

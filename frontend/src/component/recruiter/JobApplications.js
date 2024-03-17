@@ -367,23 +367,6 @@ const ApplicationTile = (props) => {
       const address = `${application.jobApplicant.resume}`;
       console.log(address);
       window.open(address)
-      // axios(address, {
-      //   method: "GET",
-      //   responseType: "blob",
-      // })
-      //   .then((response) => {
-      //     const file = new Blob([response.data], { type: "application/pdf" });
-      //     const fileURL = URL.createObjectURL(file);
-      //     window.open(fileURL);
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //     setPopup({
-      //       open: true,
-      //       severity: "error",
-      //       message: "Error",
-      //     });
-      //   });
     } else {
       setPopup({
         open: true,

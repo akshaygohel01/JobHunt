@@ -8,9 +8,6 @@ const Recruiter = require("../db/Recruiter");
 const Job = require("../db/Job");
 const Application = require("../db/Application");
 const Rating = require("../db/Rating");
-
-//The express.Router() function is used to create a new router object. 
-//This function is used when you want to create a new router object in your program to handle requests.
 const router = express.Router();
 
 // To add new job
@@ -18,8 +15,6 @@ router.post("/jobs", jwtAuth, (req, res) => {
   const user = req.user;
 
   if (user.type != "recruiter") {
-    // applicant trying to add new job 
-    // not authorised 
     res.status(401).json({
       message: "You don't have permissions to add jobs",
     });
@@ -422,6 +417,7 @@ router.put("/user", jwtAuth, (req, res) => {
         if (data.bio) {
           recruiter.bio = data.bio;
         }
+        // if(data.)
         recruiter
           .save()
           .then(() => {
@@ -490,12 +486,6 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
   }
   const data = req.body;
   const jobId = req.params.id;
-
-  // check whether applied previously
-  // find job
-  // check count of active applications < limit
-  // check user had < 10 active applications && check if user is not having any accepted jobs (user id)
-  // store the data in applications
 
   Application.findOne({
     userId: user._id,
@@ -1352,4 +1342,18 @@ router.get("/rating", jwtAuth, (req, res) => {
 });
 
 
+router.post("/verify", jwtAuth, async (req, res) => {
+  let { id, status } = req.body;
+  await User.findOneAndUpdate({ _id: id }, { status: status });
+  res.json({ id, status });
+});
+
+router.get("/getRecruiters", jwtAuth, async (req, res) => {
+  let recruiters = await User.find({ type: "recruiter" });
+  res.json(recruiters);
+});
+
+router.get("/recruiter/status", jwtAuth, async (req, res) => {
+  res.json({ status: req.user.status });
+});
 module.exports = router;

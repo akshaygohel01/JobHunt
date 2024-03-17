@@ -22,7 +22,7 @@ router.get("/resume/:file", (req, res) => {
   //   }
   //   res.sendFile(address);
   // });
-  res.sendFile(`${req.params.file}`)
+  res.sendFile(`${req.params.file}`)  
 });
 
 router.get("/profile/:file", (req, res) => {
@@ -37,6 +37,19 @@ router.get("/profile/:file", (req, res) => {
   //   res.sendFile(address);
   // });
   res.sendFile(`${req.params.file}`);
+});
+
+
+router.get("/verification/:file", (req, res) => {
+  const filePath = path.join(
+    __dirname,
+    "..",
+    "public",
+    "verification",
+    req.params.file
+  );
+
+  res.sendFile(filePath);
 });
 
 module.exports = router;
