@@ -31,6 +31,7 @@ router.post("/signup", (req, res) => {
         email: data.email,
         password: data.password,
         type: data.type,
+        verificationDocument:  data.verificationDocument         //changes
       });
 
       user

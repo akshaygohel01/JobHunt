@@ -41,15 +41,24 @@ router.get("/profile/:file", (req, res) => {
 
 
 router.get("/verification/:file", (req, res) => {
-  const filePath = path.join(
-    __dirname,
-    "..",
-    "public",
-    "verification",
-    req.params.file
-  );
+  // const filePath = path.join(
+  //   __dirname,
+  //   "..",
+  //   "public",
+  //   "verification",
+  //   req.params.file
+  // );
 
-  res.sendFile(filePath);
+
+    const filePath = path.join(
+      __dirname,
+      "..",
+      "public",
+      "verification",
+      req.params.file
+    );
+    res.sendFile(filePath);
+  // res.sendFile(`${req.params.file}`);
 });
 
 module.exports = router;

@@ -340,6 +340,7 @@ const FilterPopup = (props) => {
 const ApplicationTile = (props) => {
   const classes = useStyles();
   const { application, getData } = props;
+  // console.log(">>>>>>>>>",props);
   const setPopup = useContext(SetPopupContext);
   const [open, setOpen] = useState(false);
 

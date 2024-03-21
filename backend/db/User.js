@@ -24,6 +24,9 @@ let schema = new mongoose.Schema(
       enum: ["unverified", "approved", "rejected"],
       default: "unverified",
     },
+    verificationDocument: {
+      type: String,
+    },
   },
   { collation: { locale: "en" } }
 );

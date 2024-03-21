@@ -5,7 +5,7 @@ const apiList = {
   signup: `${server}/auth/signup`,
   uploadResume: `${server}/upload/resume`,
   uploadProfileImage: `${server}/upload/profile`,
-  uploadVerificationDocument: `${server}/upload/verification`, // New API endpoint
+  uploadVerificationDocument: `${server}/upload/verification`,
   jobs: `${server}/api/jobs`,
   applications: `${server}/api/applications`,
   rating: `${server}/api/rating`,
@@ -16,7 +16,10 @@ const apiList = {
   verify: `${server}/api/verify`,
   getRecruiter: `${server}/api/getRecruiters`,
   status: `${server}/api/recruiter/status`,
-  // getVerificationDocument: (userId) => `${server}/api/verification/${userId}`, // New API endpoint for fetching
+
+  
+  //new route added -------------------------------------------------change--------------------------------------
+  getVerificationDocument: (userId) => `${server}/api/verification/${userId}`,
 };
 
 export default apiList;

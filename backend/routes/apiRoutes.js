@@ -9,6 +9,8 @@ const Job = require("../db/Job");
 const Application = require("../db/Application");
 const Rating = require("../db/Rating");
 const router = express.Router();
+const path = require('path');
+const axios = require('axios')
 
 // To add new job
 router.post("/jobs", jwtAuth, (req, res) => {
@@ -417,7 +419,9 @@ router.put("/user", jwtAuth, (req, res) => {
         if (data.bio) {
           recruiter.bio = data.bio;
         }
-        // if(data.)
+        if(data.verificationDocument){
+          recruiter.verificationDocument = data.verificationDocument;
+        }
         recruiter
           .save()
           .then(() => {
@@ -686,21 +690,8 @@ router.put("/applications/:id", jwtAuth, (req, res) => {
   const id = req.params.id;
   const status = req.body.status;
 
-  // "applied", // when a applicant is applied
-  // "shortlisted", // when a applicant is shortlisted
-  // "accepted", // when a applicant is accepted
-  // "rejected", // when a applicant is rejected
-  // "deleted", // when any job is deleted
-  // "cancelled", // an application is cancelled by its author or when other application is accepted
-  // "finished", // when job is over
-
   if (user.type === "recruiter") {
     if (status === "accepted") {
-      // get job id from application
-      // get job info for maxPositions count
-      // count applications that are already accepted
-      // compare and if condition is satisfied, then save
-
       Application.findOne({
         _id: id,
         recruiterId: user._id,
@@ -872,7 +863,6 @@ router.put("/applications/:id", jwtAuth, (req, res) => {
   }
 });
 
-// get a list of final applicants for current job : recruiter
 // get a list of final applicants for all his jobs : recuiter
 router.get("/applicants", jwtAuth, (req, res) => {
   const user = req.user;
@@ -1350,10 +1340,79 @@ router.post("/verify", jwtAuth, async (req, res) => {
 
 router.get("/getRecruiters", jwtAuth, async (req, res) => {
   let recruiters = await User.find({ type: "recruiter" });
+  console.log(recruiters);
   res.json(recruiters);
 });
 
 router.get("/recruiter/status", jwtAuth, async (req, res) => {
   res.json({ status: req.user.status });
 });
+
+
+//new route added -----------------------------------------------------change-----------------------------------
+// router.get("/verification/:userId", async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     const recruiter = await Recruiter.findOne({ userId });
+//     if (!recruiter) {
+//       return res.status(404).json({ message: "Recruiter not found" });
+//     }
+//     const verificationDocument = recruiter.verificationDocument;
+//     if (!verificationDocument) {
+//       return res.status(404).json({ message: "Verification document not found" });
+//     }
+    
+//     // If the verification document is a URL
+//     if (verificationDocument.startsWith('http')) {
+//       const response = await axios.get(verificationDocument, { responseType: 'stream' });
+//       return response.data.pipe(res);
+//     }
+    
+//     // If the verification document is a file path
+//     const absolutePath = path.join(__dirname, '..', 'public', 'verification', verificationDocument);
+//     res.sendFile(absolutePath);
+//   } catch (error) {
+//     console.error("Error fetching verification document:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+router.get("/verification/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const recruiter = await Recruiter.findOne({ userId });
+    if (!recruiter) {
+      return res.status(404).json({ message: "Recruiter not found" });
+    }
+    const verificationDocument = recruiter.verificationDocument;
+    if (!verificationDocument) {
+      return res
+        .status(404)
+        .json({ message: "Verification document not found" });
+    }
+
+    // If the verification document is a URL
+    if (verificationDocument.startsWith("http")) {
+      const response = await axios.get(verificationDocument, {
+        responseType: "stream",
+      });
+      return response.data.pipe(res);
+    }
+
+    // If the verification document is a file path
+    const absolutePath = path.join(
+      __dirname,
+      "..",
+      "public",
+      "verification",
+      verificationDocument
+    );
+    res.sendFile(absolutePath);
+  } catch (error) {
+    console.error("Error fetching verification document:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 module.exports = router;

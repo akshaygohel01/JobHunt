@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
   Card,
@@ -7,6 +7,10 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import apiList from "../lib/apiList";
+
+import axios from 'axios';
+import { SetPopupContext } from "../App";
+
 
 const useStyles = makeStyles((theme) => ({
   recruiterCard: {
@@ -28,9 +32,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Recruiters() {
+const Recruiters = () => {
   const classes = useStyles();
   const [data, setdata] = useState([]);
+  const setPopup = useContext(SetPopupContext);
 
   useEffect(() => {
     fetch(apiList.getRecruiter, {
@@ -59,43 +64,70 @@ function Recruiters() {
     })
       .then((res) => res.json())
       .then((result) => {
-        let newData = data.map((rec) => {
-          if (rec._id === result.id) {
+        let newData = data.map((recruiter) => {
+          if (recruiter._id === result.id) {
             return {
-              ...rec,
+              ...recruiter,
               status: result.status,
             };
           }
-          return rec;
+          return recruiter;
         });
         setdata(newData);
       });
   }
 
+  //new function added for downloading verification document  -----------------    change ---------------------
+  const getVerificationDocument = (recruiter) => {
+    console.log(">>>>>>>>>>", recruiter);
+    if (
+      recruiter &&
+      recruiter.verificationDocument &&
+      recruiter.verificationDocument !== ""
+    ) {
+      window.open(apiList.getVerificationDocument(recruiter._id));
+    } else {
+      setPopup({
+        open: true,
+        severity: "error",
+        message: "No verification document found",
+      });
+    }
+  };
+
   return (
     <div>
-      {data.map((rec) => (
-        <Card key={rec._id} className={classes.recruiterCard}>
-          <Typography variant="h6">{rec.email}</Typography>
-          {rec.status === "unverified" ? (
+      {data.map((recruiter) => (
+        <Card key={recruiter._id} className={classes.recruiterCard}>
+          <Typography variant="h6">{recruiter.email}</Typography>
+          {recruiter.status === "unverified" ? (
             <div className={classes.buttonContainer}>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => verify(rec._id, "approved")}
+                onClick={() => verify(recruiter._id, "approved")}
               >
                 Accept
               </Button>
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => verify(rec._id, "rejected")}
+                onClick={() => verify(recruiter._id, "rejected")}
               >
                 Reject
               </Button>
+
+              {/* button  change*/}
+              <Button
+                variant="contained"
+                color="default"
+                onClick={() => getVerificationDocument(recruiter)}
+              >
+                Download Verification Document
+              </Button>
             </div>
           ) : (
-            <Typography>{rec.status}</Typography>
+            <Typography>{recruiter.status}</Typography>
           )}
         </Card>
       ))}
