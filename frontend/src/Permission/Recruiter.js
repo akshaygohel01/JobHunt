@@ -30,6 +30,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(4),
     gap: theme.spacing(2),
   },
+  containedButton: {
+    backgroundColor: "#47df9d",
+    "&:hover": {
+      backgroundColor: "#3daf7d",
+    },
+  },
 }));
 
 const Recruiters = () => {
@@ -122,6 +128,7 @@ const Recruiters = () => {
                 variant="contained"
                 color="default"
                 onClick={() => getVerificationDocument(recruiter)}
+                className={classes.containedButton}
               >
                 Download Verification Document
               </Button>

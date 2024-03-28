@@ -17,9 +17,11 @@ const apiList = {
   getRecruiter: `${server}/api/getRecruiters`,
   status: `${server}/api/recruiter/status`,
 
-  
   //new route added -------------------------------------------------change--------------------------------------
   getVerificationDocument: (userId) => `${server}/api/verification/${userId}`,
+
+  // new route for resume
+  resume: `${server}/api/resume`,
 };
 
 export default apiList;

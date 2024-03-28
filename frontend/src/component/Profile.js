@@ -188,23 +188,6 @@ const Profile = (props) => {
       });
     }
 
-    // axios(address, {
-    //   method: "GET",
-    //   responseType: "blob",
-    // })
-    //   .then((response) => {
-    //     const file = new Blob([response.data], { type: "application/pdf" });
-    //     const fileURL = URL.createObjectURL(file);
-    //     window.open(fileURL);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     setPopup({
-    //       open: true,
-    //       severity: "error",
-    //       message: "You have not uploaded any resume. Upload one to view!",
-    //     });
-    //   });
   }
 
 

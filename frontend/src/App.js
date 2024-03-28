@@ -19,6 +19,7 @@ import MessagePopup from "./lib/MessagePopup";
 import { userType } from "./lib/isAuth";
 import Recruiters from "./Permission/Recruiter";
 import apiList from "./lib/apiList";
+import Form from "./component/Form";
 
 const useStyles = makeStyles((theme) => ({
   body: {
@@ -120,6 +121,11 @@ function App() {
               </Route>
               <Route exact path="/applications">
                 <Applications />
+              </Route>
+
+              {/* new changes--------------------------------------- */}
+              <Route exact path="/create-resume">
+                <Form />
               </Route>
 
               <Route exact path="/profile">

@@ -8,9 +8,51 @@ const Recruiter = require("../db/Recruiter");
 const Job = require("../db/Job");
 const Application = require("../db/Application");
 const Rating = require("../db/Rating");
+const Resume = require("../db/Resume");
 const router = express.Router();
 const path = require('path');
 const axios = require('axios')
+
+
+router.post("/resume", async (req, res) => {
+  try {
+    const {
+      name,
+      summary,
+      email,
+      location,
+      contactNumber,
+      education,
+      projects,
+      skills,
+    } = req.body;
+
+    // Create a new resume document
+    const newResume = new Resume({
+      name,
+      summary,
+      email,
+      location,
+      contactNumber,
+      education,
+      projects,
+      skills,
+    });
+
+    // Save the new resume document to the database
+    await newResume.save();
+
+    // Respond with success message
+    res
+      .status(201)
+      .json({ message: "Resume created successfully", resume: newResume });
+  } catch (error) {
+    // Handle errors
+    console.error("Error creating resume:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 // To add new job
 router.post("/jobs", jwtAuth, (req, res) => {
@@ -52,7 +94,6 @@ router.post("/jobs", jwtAuth, (req, res) => {
       res.status(400).json(err);
     });
 });
-
 
 // to get all the jobs [pagination] [for recruiter personal and for everyone]
 router.get("/jobs", jwtAuth, (req, res) => {
@@ -1350,33 +1391,6 @@ router.get("/recruiter/status", jwtAuth, async (req, res) => {
 
 
 //new route added -----------------------------------------------------change-----------------------------------
-// router.get("/verification/:userId", async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-//     const recruiter = await Recruiter.findOne({ userId });
-//     if (!recruiter) {
-//       return res.status(404).json({ message: "Recruiter not found" });
-//     }
-//     const verificationDocument = recruiter.verificationDocument;
-//     if (!verificationDocument) {
-//       return res.status(404).json({ message: "Verification document not found" });
-//     }
-    
-//     // If the verification document is a URL
-//     if (verificationDocument.startsWith('http')) {
-//       const response = await axios.get(verificationDocument, { responseType: 'stream' });
-//       return response.data.pipe(res);
-//     }
-    
-//     // If the verification document is a file path
-//     const absolutePath = path.join(__dirname, '..', 'public', 'verification', verificationDocument);
-//     res.sendFile(absolutePath);
-//   } catch (error) {
-//     console.error("Error fetching verification document:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
-
 router.get("/verification/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
