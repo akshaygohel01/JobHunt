@@ -22,6 +22,7 @@ const apiList = {
 
   // new route for resume
   resume: `${server}/api/resume`,
+  resumePdf: (resumeId) => `${server}/api/resume/${resumeId}/pdf`,
 };
 
 export default apiList;

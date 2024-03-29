@@ -18,7 +18,6 @@ import { SetPopupContext } from "../App";
 
 import apiList, { server } from "../lib/apiList";
 
-
 const useStyles = makeStyles((theme) => ({
   body: {
     height: "inherit",
@@ -215,30 +214,29 @@ const Form = (props) => {
   const classes = useStyles();
   const setPopup = useContext(SetPopupContext);
 
-    const [formDetails, setFormDetails] = useState({
-      name: "",
-      summary: "",
-      email: "",
-      location: "",
-      contactNumber: "",
-      education: [
-        {
-          institutionName: "",
-          degree: "",
-          startYear: "",
-          endYear: "",
-        },
-      ],
-      projects: [
-        {
-          title: "",
-          description: "",
-          link: "",
-        },
-      ],
-      skills: [],
-    });
-    
+  const [formDetails, setFormDetails] = useState({
+    name: "",
+    summary: "",
+    email: "",
+    location: "",
+    contactNumber: "",
+    education: [
+      {
+        institutionName: "",
+        degree: "",
+        startYear: "",
+        endYear: "",
+      },
+    ],
+    projects: [
+      {
+        title: "",
+        description: "",
+        link: "",
+      },
+    ],
+    skills: [],
+  });
 
   const handleInput = (key, value) => {
     setFormDetails({
@@ -247,24 +245,49 @@ const Form = (props) => {
     });
   };
 
-  
-  const handleUpdate = () => {
-    axios
-      .post(apiList.resume, formDetails)
-      .then((response) => {
-        setPopup({
-          open: true,
-          severity: "success",
-          message: response.data.message,
-        });
-      })
-      .catch((error) => {
-        setPopup({
-          open: true,
-          severity: "error",
-          message: error.response.data.message,
-        });
+  // const handleUpdate = () => {
+  //   axios
+  //     .post(apiList.resume, formDetails)
+  //     .then((response) => {
+  //       setPopup({
+  //         open: true,
+  //         severity: "success",
+  //         message: response.data.message,
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       setPopup({
+  //         open: true,
+  //         severity: "error",
+  //         message: error.response.data.message,
+  //       });
+  //     });
+  // };
+
+  const handleCreateResume = async () => {
+    try {
+      const response = await axios.post(apiList.resume, formDetails);
+      console.log('--------------',response);
+      const { message, pdfPath } = response.data;
+
+      // Show success message
+      setPopup({
+        open: true,
+        severity: "success",
+        message: message,
       });
+
+      return pdfPath;
+
+    } catch (error) {
+      // Handle errors
+      console.error("Error creating resume:", error);
+      setPopup({
+        open: true,
+        severity: "error",
+        message: "Failed to create resume",
+      });
+    }
   };
 
   return (
@@ -413,7 +436,12 @@ const Form = (props) => {
                 borderRadius: "8px",
                 height: "50px",
               }}
-              onClick={handleUpdate}
+              onClick={async () => {
+                const pdfPath = await handleCreateResume();
+                if (pdfPath) {
+                  window.open(pdfPath, "_blank"); // Open the PDF file in a new tab/window
+                }
+              }}
             >
               Create
             </Button>
