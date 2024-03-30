@@ -245,30 +245,12 @@ const Form = (props) => {
     });
   };
 
-  // const handleUpdate = () => {
-  //   axios
-  //     .post(apiList.resume, formDetails)
-  //     .then((response) => {
-  //       setPopup({
-  //         open: true,
-  //         severity: "success",
-  //         message: response.data.message,
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       setPopup({
-  //         open: true,
-  //         severity: "error",
-  //         message: error.response.data.message,
-  //       });
-  //     });
-  // };
-
   const handleCreateResume = async () => {
     try {
       const response = await axios.post(apiList.resume, formDetails);
-      console.log('--------------',response);
+      console.log("--------------", response);
       const { message, pdfPath } = response.data;
+      alert(message);
 
       // Show success message
       setPopup({
@@ -277,8 +259,9 @@ const Form = (props) => {
         message: message,
       });
 
-      return pdfPath;
-
+      const pdfUrl = `${server}${pdfPath}`;
+      window.open(pdfUrl, "_blank");
+      return pdfUrl;
     } catch (error) {
       // Handle errors
       console.error("Error creating resume:", error);
@@ -436,12 +419,7 @@ const Form = (props) => {
                 borderRadius: "8px",
                 height: "50px",
               }}
-              onClick={async () => {
-                const pdfPath = await handleCreateResume();
-                if (pdfPath) {
-                  window.open(pdfPath, "_blank"); // Open the PDF file in a new tab/window
-                }
-              }}
+              onClick={handleCreateResume}
             >
               Create
             </Button>

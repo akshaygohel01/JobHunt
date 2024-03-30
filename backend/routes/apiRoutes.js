@@ -17,86 +17,6 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 
 
-
-// router.post("/resume", async (req, res) => {
-//   try {
-//     // Extract data from request body
-//     const {
-//       name,
-//       summary,
-//       email,
-//       location,
-//       contactNumber,
-//       education,
-//       projects,
-//       skills,
-//     } = req.body;
-
-//     // Create a new resume document
-//     const newResume = new Resume({
-//       name,
-//       summary,
-//       email,
-//       location,
-//       contactNumber,
-//       education,
-//       projects,
-//       skills,
-//     });
-
-//     // Save the new resume document to the database
-//     await newResume.save();
-
-//     // Generate PDF
-//     const doc = new PDFDocument();
-//     doc.pipe(fs.createWriteStream(`resume_${newResume._id}.pdf`));
-
-//     // Add resume content to PDF
-//     doc.fontSize(20).text(`Resume for ${name}`, { align: "center" }).moveDown();
-//     doc.fontSize(14).text(`Summary: ${summary}`).moveDown();
-//     doc.fontSize(14).text(`Email: ${email}`).moveDown();
-//     doc.fontSize(14).text(`Location: ${location}`).moveDown();
-//     doc.fontSize(14).text(`Contact Number: ${contactNumber}`).moveDown();
-
-//     doc.fontSize(16).text("Education", { underline: true }).moveDown();
-//     education.forEach((edu) => {
-//       doc
-//         .fontSize(14)
-//         .text(`Institution Name: ${edu.institutionName}`)
-//         .moveDown();
-//       doc.fontSize(14).text(`Degree: ${edu.degree}`).moveDown();
-//       doc.fontSize(14).text(`Start Year: ${edu.startYear}`).moveDown();
-//       doc.fontSize(14).text(`End Year: ${edu.endYear}`).moveDown();
-//     });
-
-//     doc.fontSize(16).text("Projects", { underline: true }).moveDown();
-//     projects.forEach((project) => {
-//       doc.fontSize(14).text(`Title: ${project.title}`).moveDown();
-//       doc.fontSize(14).text(`Description: ${project.description}`).moveDown();
-//       doc.fontSize(14).text(`Link: ${project.link}`).moveDown();
-//     });
-
-//     doc.fontSize(16).text("Skills", { underline: true }).moveDown();
-//     skills.forEach((skill) => {
-//       doc.fontSize(14).text(skill).moveDown();
-//     });
-
-//     doc.end();
-
-//     // Respond with success message and PDF file path
-//     res.status(201).json({
-//       message: "Resume created successfully",
-//       resume: newResume,
-//       pdfPath: `/resume_${newResume._id}.pdf`,
-//     });
-//   } catch (error) {
-//     // Handle errors
-//     console.error("Error creating resume:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
-
-
 router.post("/resume", async (req, res) => {
   try {
     // Extract data from request body
@@ -163,14 +83,12 @@ router.post("/resume", async (req, res) => {
 
     doc.end();
 
-    // Respond with success message and PDF file path
     res.status(201).json({
       message: "Resume created successfully",
       resume: newResume,
       pdfPath: `/api/resume/${newResume._id}/pdf`, // Route to access PDF file
     });
   } catch (error) {
-    // Handle errors
     console.error("Error creating resume:", error);
     res.status(500).json({ message: "Internal server error" });
   }
@@ -179,16 +97,16 @@ router.post("/resume", async (req, res) => {
 
 router.get("/resume/:resumeId/pdf", (req, res) => {
   const resumeId = req.params.resumeId;
-  const pdfPath = path.join(__dirname, `../path/to/pdf/resume_${resumeId}.pdf`);
+  const pdfPath = path.join(__dirname, `../resume_${resumeId}.pdf`);
 
-  if (fs.existsSync(pdfPath)) {
-    res.contentType("application/pdf");
-    res.sendFile(pdfPath);
-  } else {
-    res.status(404).json({ message: "PDF file not found" });
-  }
+  
+if (fs.existsSync(pdfPath)) {
+  res.download(pdfPath, `resume_${resumeId}.pdf`);
+} else {
+  console.log("PDF file not found");
+  res.status(404).json({ message: "PDF file not found" });
+}
 });
-
 
 
 
