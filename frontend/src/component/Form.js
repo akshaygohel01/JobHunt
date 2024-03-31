@@ -250,7 +250,6 @@ const Form = (props) => {
       const response = await axios.post(apiList.resume, formDetails);
       console.log("--------------", response);
       const { message, pdfPath } = response.data;
-      alert(message);
 
       // Show success message
       setPopup({

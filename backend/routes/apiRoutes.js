@@ -10,12 +10,11 @@ const Application = require("../db/Application");
 const Rating = require("../db/Rating");
 const Resume = require("../db/Resume");
 const router = express.Router();
-const path = require('path');
-const axios = require('axios')
+const path = require("path");
+const axios = require("axios");
 
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
-
 
 router.post("/resume", async (req, res) => {
   try {
@@ -52,41 +51,112 @@ router.post("/resume", async (req, res) => {
     doc.pipe(fs.createWriteStream(pdfPath));
 
     // Add resume content to PDF
-    doc.fontSize(20).text(`Resume for ${name}`, { align: "center" }).moveDown();
-    doc.fontSize(14).text(`Summary: ${summary}`).moveDown();
-    doc.fontSize(14).text(`Email: ${email}`).moveDown();
-    doc.fontSize(14).text(`Location: ${location}`).moveDown();
-    doc.fontSize(14).text(`Contact Number: ${contactNumber}`).moveDown();
+    doc
+      .fontSize(20)
+      .fillColor("blue")
+      .text(`Resume for ${name}`, { align: "center" })
+      .moveDown();
 
-    doc.fontSize(16).text("Education", { underline: true }).moveDown();
+    const rightMargin = 50;
+    const contactInfoX = doc.page.width - rightMargin;
+
+    doc.fillColor("black");
+    doc
+      .fontSize(14)
+      .text(`Email: ${email}`, {
+        align: "right",
+        width: contactInfoX - doc.page.margins.right,
+        continued: true,
+      })
+      .moveDown();
+    doc
+      .fontSize(14)
+      .text(`Location: ${location}`, {
+        align: "right",
+        width: contactInfoX - doc.page.margins.right,
+        continued: true,
+      })
+      .moveDown();
+    doc
+      .fontSize(14)
+      .text(`Mobile No: ${contactNumber}`, {
+        align: "right",
+        width: contactInfoX - doc.page.margins.right,
+      })
+      .moveDown();
+
+    doc.fillColor("blue").fontSize(16).text("Summary", { underline: true });
+    doc.fillColor("black");
+    doc.fontSize(14).text(summary).moveDown();
+
+    doc
+      .fillColor("blue")
+      .fontSize(16)
+      .text("Education", { underline: true });
+      // .moveDown();
+    doc.fillColor("black").fontSize(14);
+    doc
+      .fillColor("#fa8a5a")
+      .text(
+        "Institution Name         Degree            Start Year          End Year"
+      );
+    doc.moveDown();
+
+    // Draw table rows
     education.forEach((edu) => {
-      doc
-        .fontSize(14)
-        .text(`Institution Name: ${edu.institutionName}`)
-        .moveDown();
-      doc.fontSize(14).text(`Degree: ${edu.degree}`).moveDown();
-      doc.fontSize(14).text(`Start Year: ${edu.startYear}`).moveDown();
-      doc.fontSize(14).text(`End Year: ${edu.endYear}`).moveDown();
+      const rowData = `${edu.institutionName.padEnd(30)}${edu.degree.padEnd(
+        20
+      )}${edu.startYear.padEnd(20)}${edu.endYear}`;
+      doc.fillColor("black").text(rowData);
+      doc.moveDown();
     });
+    doc.moveDown();
+    
 
-    doc.fontSize(16).text("Projects", { underline: true }).moveDown();
+    
+    let projectCount = 0;
+    doc
+      .fillColor("blue")
+      .fontSize(16)
+      .text("Projects", { underline: true })
+      .moveDown();
+    doc.fillColor("black");
     projects.forEach((project) => {
+      projectCount++;
+
+      doc
+        .fillColor("#fa8a5a")
+        .fontSize(14)
+        .text(`Project-${projectCount}:`)
+        .moveDown();
+      doc.fillColor("black");
       doc.fontSize(14).text(`Title: ${project.title}`).moveDown();
       doc.fontSize(14).text(`Description: ${project.description}`).moveDown();
       doc.fontSize(14).text(`Link: ${project.link}`).moveDown();
     });
 
-    doc.fontSize(16).text("Skills", { underline: true }).moveDown();
-    skills.forEach((skill) => {
-      doc.fontSize(14).text(skill).moveDown();
-    });
+    
+    
+    const bullet = "\u2022"; 
+    doc
+      .fillColor("blue")
+      .fontSize(16)
+      .text("Skills", { underline: true })
+      .moveDown();
+    doc.fillColor("black");
+    const skillsWithBullet = skills
+    .map((skill) => `${bullet} ${skill}`)
+    .join("   ");
+
+  doc.fontSize(14).text(skillsWithBullet);
+     
 
     doc.end();
 
     res.status(201).json({
       message: "Resume created successfully",
       resume: newResume,
-      pdfPath: `/api/resume/${newResume._id}/pdf`, // Route to access PDF file
+      pdfPath: `/api/resume/${newResume._id}/pdf`,
     });
   } catch (error) {
     console.error("Error creating resume:", error);
@@ -94,21 +164,17 @@ router.post("/resume", async (req, res) => {
   }
 });
 
-
 router.get("/resume/:resumeId/pdf", (req, res) => {
   const resumeId = req.params.resumeId;
   const pdfPath = path.join(__dirname, `../resume_${resumeId}.pdf`);
 
-  
-if (fs.existsSync(pdfPath)) {
-  res.download(pdfPath, `resume_${resumeId}.pdf`);
-} else {
-  console.log("PDF file not found");
-  res.status(404).json({ message: "PDF file not found" });
-}
+  if (fs.existsSync(pdfPath)) {
+    res.download(pdfPath, `resume_${resumeId}.pdf`);
+  } else {
+    console.log("PDF file not found");
+    res.status(404).json({ message: "PDF file not found" });
+  }
 });
-
-
 
 router.post("/jobs", jwtAuth, (req, res) => {
   const user = req.user;
@@ -144,7 +210,7 @@ router.post("/jobs", jwtAuth, (req, res) => {
       res.json({ message: "Job added successfully to the database" });
     })
     .catch((err) => {
-      //Whenever any user sends an invalid request to the server, 
+      //Whenever any user sends an invalid request to the server,
       //the server immediately reports it and generates an HTTP based 400 bad request error.
       res.status(400).json(err);
     });
@@ -156,7 +222,6 @@ router.get("/jobs", jwtAuth, (req, res) => {
 
   let findParams = {};
   let sortParams = {};
-
 
   // to list down jobs posted by a particular recruiter
   if (user.type === "recruiter" && req.query.myjobs) {
@@ -266,10 +331,6 @@ router.get("/jobs", jwtAuth, (req, res) => {
 
   console.log(findParams);
   console.log(sortParams);
-
-  // Job.find(findParams).collation({ locale: "en" }).sort(sortParams);
-  // .skip(skip)
-  // .limit(limit)
 
   let arr = [
     {
@@ -413,7 +474,6 @@ router.delete("/jobs/:id", jwtAuth, (req, res) => {
     });
 });
 
-
 router.get("/user", jwtAuth, (req, res) => {
   const user = req.user;
   if (user.type === "recruiter") {
@@ -446,7 +506,6 @@ router.get("/user", jwtAuth, (req, res) => {
       });
   }
 });
-
 
 router.get("/user/:id", jwtAuth, (req, res) => {
   User.findOne({ _id: req.params.id })
@@ -493,7 +552,6 @@ router.get("/user/:id", jwtAuth, (req, res) => {
     });
 });
 
-
 router.put("/user", jwtAuth, (req, res) => {
   const user = req.user;
   const data = req.body;
@@ -515,7 +573,7 @@ router.put("/user", jwtAuth, (req, res) => {
         if (data.bio) {
           recruiter.bio = data.bio;
         }
-        if(data.verificationDocument){
+        if (data.verificationDocument) {
           recruiter.verificationDocument = data.verificationDocument;
         }
         recruiter
@@ -573,8 +631,6 @@ router.put("/user", jwtAuth, (req, res) => {
       });
   }
 });
-
-
 
 router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
   const user = req.user;
@@ -685,7 +741,6 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
     });
 });
 
-
 router.get("/jobs/:id/applications", jwtAuth, (req, res) => {
   const user = req.user;
   if (user.type != "recruiter") {
@@ -695,8 +750,6 @@ router.get("/jobs/:id/applications", jwtAuth, (req, res) => {
     return;
   }
   const jobId = req.params.id;
-
-  
 
   let findParams = {
     jobId: jobId,
@@ -1427,7 +1480,6 @@ router.get("/rating", jwtAuth, (req, res) => {
   });
 });
 
-
 router.post("/verify", jwtAuth, async (req, res) => {
   let { id, status } = req.body;
   await User.findOneAndUpdate({ _id: id }, { status: status });
@@ -1443,7 +1495,6 @@ router.get("/getRecruiters", jwtAuth, async (req, res) => {
 router.get("/recruiter/status", jwtAuth, async (req, res) => {
   res.json({ status: req.user.status });
 });
-
 
 //new route added -----------------------------------------------------change-----------------------------------
 router.get("/verification/:userId", async (req, res) => {
@@ -1482,6 +1533,5 @@ router.get("/verification/:userId", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 module.exports = router;
