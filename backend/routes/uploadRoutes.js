@@ -3,7 +3,6 @@ const express = require("express");
 const path = require('path');
 require("dotenv").config()
 const cloudinary = require("cloudinary");
-// const RecruiterInfo = require("../db/Recruiter");
 
 cloudinary.config({
   cloud_name:"jobhunt2024",
@@ -13,17 +12,16 @@ cloudinary.config({
 
 
 const router = express.Router();
-
 const upload = multer({
   storage: multer.diskStorage({}),
-  fileFilter: function(req, file, cb){
-    if(!file.mimetype.match(/jpg|jpeg|pdf|gif|png/)){
-      cb('Error: File is not supported',false)
+  fileFilter: function (req, file, cb) {
+    if (!file.mimetype.match(/jpg|jpeg|pdf|gif|png/)) {
+      cb("Error: File is not supported", false);
       return;
     }
-    cb(null,true)
-  }
-}).single('image')
+    cb(null, true);
+  },
+}).single("image");
 
 //resume uploading
 router.post("/resume", (req, res) => {
@@ -60,6 +58,8 @@ router.post("/resume", (req, res) => {
     }
   });
 })
+
+
 
 //profile image uploading
 router.post("/profile", (req, res) => {

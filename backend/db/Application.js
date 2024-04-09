@@ -52,6 +52,25 @@ let schema = new mongoose.Schema(
         msg: "Statement of purpose should not be greater than 250 words",
       },
     },
+    gender: {
+      type: String,
+      enum: ["male","female"],
+    },
+    phoneNumber: {
+      type: String,
+    }, 
+    email: {
+      type: String,
+    },
+    introduction: {
+      type: String
+    },
+    resume: {
+      type: String,
+    },
+    message: {
+      type: String,
+    }
   },
   { collation: { locale: "en" } }
 );

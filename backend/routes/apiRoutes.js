@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jwtAuth = require("../lib/jwtAuth");
+const multer = require("multer");
 
 const User = require("../db/User");
 const JobApplicant = require("../db/JobApplicant");
@@ -12,6 +13,26 @@ const Resume = require("../db/Resume");
 const router = express.Router();
 const path = require("path");
 const axios = require("axios");
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // Define the destination folder for storing resume files
+  },
+  filename: function (req, file, cb) {
+    cb(null, new Date().toISOString().replace(/:/g, "-") + file.originalname); // Define the filename
+  },
+});
+const fileFilter = (req, file, cb) => {
+  // Accept only PDF files, you can adjust the file types according to your requirement
+  if (file.mimetype === "application/pdf") {
+    cb(null, true);
+  } else {
+    cb(new Error("Only PDF files are allowed"), false);
+  }
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
 
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
@@ -632,114 +653,178 @@ router.put("/user", jwtAuth, (req, res) => {
   }
 });
 
-router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
-  const user = req.user;
-  if (user.type != "applicant") {
-    res.status(401).json({
-      message: "You don't have permissions to apply for a job",
-    });
-    return;
-  }
-  const data = req.body;
-  const jobId = req.params.id;
+router.post(
+  "/jobs/:id/applications",
+  jwtAuth,
+  upload.single("resume"),
+  (req, res) => {
+    const user = req.user;
+    if (user.type !== "applicant") {
+      return res.status(401).json({
+        message: "You don't have permissions to apply for a job",
+      });
+    }
 
-  Application.findOne({
-    userId: user._id,
-    jobId: jobId,
-    status: {
-      $nin: ["deleted", "accepted", "cancelled"],
-    },
-  })
-    .then((appliedApplication) => {
-      console.log(appliedApplication);
-      if (appliedApplication !== null) {
-        res.status(400).json({
-          message: "You have already applied for this job",
-        });
-        return;
-      }
+    console.log(req.body);
 
-      Job.findOne({ _id: jobId })
-        .then((job) => {
-          if (job === null) {
-            res.status(404).json({
-              message: "Job does not exist",
-            });
-            return;
-          }
-          Application.countDocuments({
-            jobId: jobId,
-            status: {
-              $nin: ["rejected", "deleted", "cancelled", "finished"],
-            },
-          })
-            .then((activeApplicationCount) => {
-              if (activeApplicationCount < job.maxApplicants) {
-                Application.countDocuments({
-                  userId: user._id,
-                  status: {
-                    $nin: ["rejected", "deleted", "cancelled", "finished"],
-                  },
-                })
-                  .then((myActiveApplicationCount) => {
-                    if (myActiveApplicationCount < 10) {
-                      Application.countDocuments({
-                        userId: user._id,
-                        status: "accepted",
-                      }).then((acceptedJobs) => {
-                        if (acceptedJobs === 0) {
-                          const application = new Application({
-                            userId: user._id,
-                            recruiterId: job.userId,
-                            jobId: job._id,
-                            status: "applied",
-                            sop: data.sop,
-                          });
-                          application
-                            .save()
-                            .then(() => {
-                              res.json({
-                                message: "Job application successful",
-                              });
-                            })
-                            .catch((err) => {
-                              res.status(400).json(err);
-                            });
-                        } else {
-                          res.status(400).json({
-                            message:
-                              "You already have an accepted job. Hence you cannot apply.",
-                          });
-                        }
-                      });
-                    } else {
-                      res.status(400).json({
-                        message:
-                          "You have 10 active applications. Hence you cannot apply.",
-                      });
-                    }
-                  })
-                  .catch((err) => {
-                    res.status(400).json(err);
-                  });
-              } else {
-                res.status(400).json({
-                  message: "Application limit reached",
-                });
-              }
-            })
-            .catch((err) => {
-              res.status(400).json(err);
-            });
-        })
-        .catch((err) => {
-          res.status(400).json(err);
-        });
+    const { sop, gender, phoneNumber, email, introduction, resume } = req.body;
+    const jobId = req.params.id;
+
+    Application.findOne({
+      userId: user._id,
+      jobId: jobId,
+      status: {
+        $nin: ["deleted", "accepted", "cancelled"],
+      },
     })
-    .catch((err) => {
-      res.json(400).json(err);
-    });
+      .then((appliedApplication) => {
+        if (appliedApplication !== null) {
+          return res.status(400).json({
+            message: "You have already applied for this job",
+          });
+        }
+
+        Job.findOne({ _id: jobId })
+          .then((job) => {
+            if (!job) {
+              return res.status(404).json({
+                message: "Job does not exist",
+              });
+            }
+            Application.countDocuments({
+              jobId: jobId,
+              status: {
+                $nin: ["rejected", "deleted", "cancelled", "finished"],
+              },
+            })
+              .then((activeApplicationCount) => {
+                if (activeApplicationCount < job.maxApplicants) {
+                  Application.countDocuments({
+                    userId: user._id,
+                    status: {
+                      $nin: ["rejected", "deleted", "cancelled", "finished"],
+                    },
+                  })
+                    .then((myActiveApplicationCount) => {
+                      if (myActiveApplicationCount < 10) {
+                        Application.countDocuments({
+                          userId: user._id,
+                          status: "accepted",
+                        }).then((acceptedJobs) => {
+                          if (acceptedJobs === 0) {
+                            const application = new Application({
+                              userId: user._id,
+                              recruiterId: job.userId,
+                              jobId: job._id,
+                              status: "applied",
+                              sop: sop,
+                              gender: gender,
+                              phoneNumber: phoneNumber,
+                              email: email,
+                              introduction: introduction,
+                              resume: req.file.path, // Save the file path in the resume field
+                            });
+                            application
+                              .save()
+                              .then(() => {
+                                res.json({
+                                  message: "Job application successful",
+                                });
+                              })
+                              .catch((err) => {
+                                res.status(400).json(err);
+                              });
+                          } else {
+                            res.status(400).json({
+                              message:
+                                "You already have an accepted job. Hence you cannot apply.",
+                            });
+                          }
+                        });
+                      } else {
+                        res.status(400).json({
+                          message:
+                            "You have 10 active applications. Hence you cannot apply.",
+                        });
+                      }
+                    })
+                    .catch((err) => {
+                      res.status(400).json(err);
+                    });
+                } else {
+                  res.status(400).json({
+                    message: "Application limit reached",
+                  });
+                }
+              })
+              .catch((err) => {
+                res.status(400).json(err);
+              });
+          })
+          .catch((err) => {
+            res.status(400).json(err);
+          });
+      })
+      .catch((err) => {
+        res.json(400).json(err);
+      });
+  }
+);
+
+router.post("/applications/:id", jwtAuth, async (req, res) => {
+  const { message } = req.body;
+  Application.findOneAndUpdate(
+    { _id: req.params.id },
+    {
+      message: message,
+    }
+  ).then(() => {
+    res.json({ message: "message send successfully" });
+  });
 });
+
+router.post("/applications/:id/sendMessage", jwtAuth, (req, res) => {
+  const user = req.user;
+  const id = req.params.id;
+  const message = req.body.message;
+
+  // Update the application in the database to store the message
+  Application.findByIdAndUpdate(
+    id,
+    { $set: { message: message } }, // Update the message field in the application document
+    { new: true }, // Return the updated document
+    (err, updatedApplication) => {
+      if (err) {
+        return res.status(500).json({ message: "Internal server error" });
+      }
+      if (!updatedApplication) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      // Assuming the message was successfully stored in the database
+      // Here you can implement code to send the message to the applicant (e.g., via email or a notification)
+      res.json({ message: "Message sent successfully" });
+    }
+  );
+});
+
+router.get("/applications/:id/message", jwtAuth, (req, res) => {
+  const id = req.params.id;
+
+  // Find the application by its ID
+  Application.findById(id, (err, application) => {
+    if (err) {
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    // Send the message associated with the application
+    res.json({ message: application.message });
+  });
+});
+
+
 
 router.get("/jobs/:id/applications", jwtAuth, (req, res) => {
   const user = req.user;
@@ -1533,5 +1618,8 @@ router.get("/verification/:userId", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
+
 
 module.exports = router;

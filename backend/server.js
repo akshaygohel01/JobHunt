@@ -6,6 +6,7 @@ const nodemailer=require('nodemailer');
 const { v4: uuidv4 } = require("uuid");
 var cors = require("cors");
 const fs = require("fs");
+const path = require("path");
 
 require("dotenv").config()
 
@@ -36,6 +37,7 @@ if (!fs.existsSync("./public/verification")) {
 }
 
 const app = express();
+app.use(express.static('public'));
 // const port = process.env.PORT || 8080;
 
 app.use(bodyParser.json()); // support json encoded bodies
@@ -46,11 +48,13 @@ app.use(cors());
 app.use(express.json());
 app.use(passportConfig.initialize());
 
+app.use("/uploads", express.static(path.join(__dirname, 'uploads')));
+  
 // Routing
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/api", require("./routes/apiRoutes"));
 app.use("/upload", require("./routes/uploadRoutes"));
-app.use("/host", require("./routes/downloadRoutes"));
+app.use("/host", require("./routes/downloadRoutes")); 
 
 app.listen(8080, () => {
   console.log("Server started on port 8080!");

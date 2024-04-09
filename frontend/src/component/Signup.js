@@ -499,7 +499,7 @@ const Signup = (props) => {
                 }
               />
             </Grid>
-            <Grid item>
+            {/* <Grid item>
               <FileUploadInput
                 className={classes.inputBox}
                 label="Resume (Images only)"
@@ -507,8 +507,9 @@ const Signup = (props) => {
                 uploadTo={apiList.uploadResume}
                 handleInput={handleInput}
                 identifier={"resume"}
+                accept=".pdf"
               />
-            </Grid>
+            </Grid> */}
             <Grid item>
               <FileUploadInput
                 className={classes.inputBox}

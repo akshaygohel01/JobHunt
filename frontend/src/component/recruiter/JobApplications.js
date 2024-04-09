@@ -80,7 +80,7 @@ const FilterPopup = (props) => {
               item
               xs={9}
               justify="space-around"
-            // alignItems="center"
+              // alignItems="center"
             >
               <Grid item>
                 <FormControlLabel
@@ -340,14 +340,53 @@ const FilterPopup = (props) => {
 const ApplicationTile = (props) => {
   const classes = useStyles();
   const { application, getData } = props;
-  // console.log(">>>>>>>>>",props);
+
   const setPopup = useContext(SetPopupContext);
   const [open, setOpen] = useState(false);
 
   const appliedOn = new Date(application.dateOfApplication);
+  const [message, setMessage] = useState("");
+  const [messagePopupOpen, setMessagePopupOpen] = useState(false);
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseMessagePopup = () => {
+    setMessagePopupOpen(false);
+  };
+
+  const handleMessageButtonClick = () => {
+    setMessagePopupOpen(true);
+  };
+
+  const handleMessageSubmit = (id) => {
+    console.log(id);
+
+    setMessage("");
+    setMessagePopupOpen(false);
+    axios
+      .post(
+        apiList.applications + "/" + id,
+        { message },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      )
+      .then((response) => {
+        setPopup({
+          open: true,
+          severity: "success",
+          message: response.data.message,
+        });
+        getData(); // Update the applications list after sending the message
+      })
+      .catch((err) => {
+        setPopup({
+          open: true,
+          severity: "error",
+          message: err.response.data.message,
+        });
+        console.log(err.response);
+      });
   };
 
   const colorSet = {
@@ -360,14 +399,11 @@ const ApplicationTile = (props) => {
     finished: "#4EA5D9",
   };
 
+  //getting resume   changes made
   const getResume = () => {
-    if (
-      application.jobApplicant.resume &&
-      application.jobApplicant.resume !== ""
-    ) {
-      const address = `${application.jobApplicant.resume}`;
-      console.log(address);
-      window.open(address)
+    if (application.resume && application.resume !== "") {
+      const resumeURL = `${server}/${application.resume}`; // Assuming server is the base URL where resumes are stored
+      window.open(resumeURL, "_blank");
     } else {
       setPopup({
         open: true,
@@ -416,6 +452,8 @@ const ApplicationTile = (props) => {
             style={{
               background: colorSet["shortlisted"],
               color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
             }}
             onClick={() => updateStatus("shortlisted")}
           >
@@ -428,6 +466,9 @@ const ApplicationTile = (props) => {
             style={{
               background: colorSet["rejected"],
               color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
+              marginLeft: "8px",
             }}
             onClick={() => updateStatus("rejected")}
           >
@@ -444,6 +485,8 @@ const ApplicationTile = (props) => {
             style={{
               background: colorSet["accepted"],
               color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
             }}
             onClick={() => updateStatus("accepted")}
           >
@@ -456,6 +499,9 @@ const ApplicationTile = (props) => {
             style={{
               background: colorSet["rejected"],
               color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
+              marginLeft: "8px",
             }}
             onClick={() => updateStatus("rejected")}
           >
@@ -472,10 +518,27 @@ const ApplicationTile = (props) => {
             style={{
               background: colorSet["rejected"],
               color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
             }}
           >
             Rejected
           </Paper>
+        </Grid>
+        <Grid item xs>
+          <Button
+            className={classes.statusBlock}
+            style={{
+              background: colorSet["finished"],
+              color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
+              marginLeft: "10px",
+            }}
+            onClick={handleMessageButtonClick} // Open the popup when clicked
+          >
+            Submit
+          </Button>
         </Grid>
       </>
     ),
@@ -487,10 +550,27 @@ const ApplicationTile = (props) => {
             style={{
               background: colorSet["accepted"],
               color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
             }}
           >
             Accepted
           </Paper>
+        </Grid>
+        <Grid item xs>
+          <Button
+            className={classes.statusBlock}
+            style={{
+              background: colorSet["finished"],
+              color: "#ffffff",
+              height: "30%",
+              marginTop: "9px",
+              marginLeft: "10px",
+            }}
+            onClick={handleMessageButtonClick} //
+          >
+            Send Message
+          </Button>
         </Grid>
       </>
     ),
@@ -543,6 +623,7 @@ const ApplicationTile = (props) => {
             className={classes.avatar}
           />
         </Grid>
+
         <Grid container item xs={7} spacing={1} direction="column">
           <Grid item>
             <Typography variant="h5">
@@ -564,8 +645,9 @@ const ApplicationTile = (props) => {
             Education:{" "}
             {application.jobApplicant.education
               .map((edu) => {
-                return `${edu.institutionName} (${edu.startYear}-${edu.endYear ? edu.endYear : "Ongoing"
-                  })`;
+                return `${edu.institutionName} (${edu.startYear}-${
+                  edu.endYear ? edu.endYear : "Ongoing"
+                })`;
               })
               .join(", ")}
           </Grid>
@@ -573,11 +655,54 @@ const ApplicationTile = (props) => {
             SOP: {application.sop !== "" ? application.sop : "Not Submitted"}
           </Grid>
           <Grid item>
+            <Grid item>Email: {application.email}</Grid>
+            <Grid item>Gender: {application.gender}</Grid>
+            <Grid item>Phone Number: {application.phoneNumber}</Grid>
+            <Grid item>Introduction: {application.introduction}</Grid>
+            {/* <Grid item>resume: {application.resume}</Grid> */}
+
             {application.jobApplicant.skills.map((skill) => (
               <Chip label={skill} style={{ marginRight: "2px" }} />
             ))}
           </Grid>
         </Grid>
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          className={classes.popupDialog}
+        >
+          <Paper
+            style={{
+              padding: "20px",
+              outline: "none",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              minWidth: "30%",
+            }}
+          >
+            {/* Text field for message input */}
+            <TextField
+              multiline
+              rows={4}
+              variant="outlined"
+              label="Message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              style={{ marginBottom: "10px", width: "100%" }}
+            />
+            {/* Submit button */}
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ padding: "10px 50px" }}
+              onClick={() => handleMessageSubmit(application._id)}
+            >
+              Send
+            </Button>
+          </Paper>
+        </Modal>
         <Grid item container direction="column" xs={3}>
           <Grid item>
             <Button
@@ -586,7 +711,7 @@ const ApplicationTile = (props) => {
               color="primary"
               onClick={() => getResume()}
             >
-              Download Resume
+              View Resume
             </Button>
           </Grid>
           <Grid item container xs>
@@ -594,7 +719,12 @@ const ApplicationTile = (props) => {
           </Grid>
         </Grid>
       </Grid>
-      <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
+
+      <Modal
+        open={messagePopupOpen}
+        onClose={handleCloseMessagePopup}
+        className={classes.popupDialog}
+      >
         <Paper
           style={{
             padding: "20px",
@@ -602,17 +732,28 @@ const ApplicationTile = (props) => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            minWidth: "30%",
             alignItems: "center",
+            minWidth: "30%",
           }}
         >
+          {/* Text field for message input */}
+          <TextField
+            multiline
+            rows={4}
+            variant="outlined"
+            label="Message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            style={{ marginBottom: "10px", width: "100%" }}
+          />
+          {/* Submit button */}
           <Button
             variant="contained"
             color="primary"
             style={{ padding: "10px 50px" }}
-          // onClick={() => changeRating()}
+            onClick={() => handleMessageSubmit(application._id)}
           >
-            Submit
+            Send
           </Button>
         </Paper>
       </Modal>
@@ -719,7 +860,12 @@ const JobApplications = (props) => {
         style={{ padding: "30px", minHeight: "93vh" }}
       >
         <Grid item>
-          <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>Applications</Typography>
+          <Typography
+            variant="h2"
+            style={{ color: "white", fontWeight: "bold" }}
+          >
+            Applications
+          </Typography>
         </Grid>
         <Grid item>
           <IconButton onClick={() => setFilterOpen(true)}>
@@ -743,10 +889,17 @@ const JobApplications = (props) => {
               </Grid>
             ))
           ) : (
-            <Typography variant="h5" style={{
-              height: "50px", textAlign: "center",
-              background: "rgba(255,255,255,0.5)", marginLeft: "25%", marginRight: "25%", paddingTop: "15px"
-            }}>
+            <Typography
+              variant="h5"
+              style={{
+                height: "50px",
+                textAlign: "center",
+                background: "rgba(255,255,255,0.5)",
+                marginLeft: "25%",
+                marginRight: "25%",
+                paddingTop: "15px",
+              }}
+            >
               No Applications Found
             </Typography>
           )}

@@ -71,7 +71,7 @@ const FilterPopup = (props) => {
         }}
       >
         <Grid container direction="column" alignItems="center" spacing={3}>
-          { }
+          {}
           <Grid container item alignItems="center">
             <Grid item xs={3}>
               Sort
@@ -386,30 +386,9 @@ const ApplicationTile = (props) => {
   };
 
   const getResume = () => {
-    if (
-      application.jobApplicant.resume &&
-      application.jobApplicant.resume !== ""
-    ) {
-      const address = `${application.jobApplicant.resume}`;
-      console.log(address);
-      window.open(address)
-      // axios(address, {
-      //   method: "GET",
-      //   responseType: "blob",
-      // })
-      //   .then((response) => {
-      //     const file = new Blob([response.data], { type: "application/pdf" });
-      //     const fileURL = URL.createObjectURL(file);
-      //     window.open(fileURL);
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //     setPopup({
-      //       open: true,
-      //       severity: "error",
-      //       message: "Error",
-      //     });
-      //   });
+    if (application.resume && application.resume !== "") {
+      const resumeURL = `${server}/${application.resume}`; // Assuming server is the base URL where resumes are stored
+      window.open(resumeURL, "_blank");
     } else {
       setPopup({
         open: true,
@@ -488,9 +467,6 @@ const ApplicationTile = (props) => {
           <Grid item>Role: {application.job.jobType}</Grid>
           <Grid item>Applied On: {appliedOn.toLocaleDateString()}</Grid>
           <Grid item>
-            SOP: {application.sop !== "" ? application.sop : "Not Submitted"}
-          </Grid>
-          <Grid item>
             {application.jobApplicant.skills.map((skill) => (
               <Chip label={skill} style={{ marginRight: "2px" }} />
             ))}
@@ -504,7 +480,7 @@ const ApplicationTile = (props) => {
               color="primary"
               onClick={() => getResume()}
             >
-              Download Resume
+              View Resume
             </Button>
           </Grid>
           <Grid item container xs>
@@ -515,6 +491,8 @@ const ApplicationTile = (props) => {
               className={classes.statusBlock}
               style={{
                 background: "#09BC8A",
+                height: "35%",
+                marginTop: "10px",
               }}
               onClick={() => {
                 setOpenEndJob(true);
@@ -526,10 +504,17 @@ const ApplicationTile = (props) => {
           <Grid item>
             <Button
               variant="contained"
-              color="primary"
+              // color="primary"
               className={classes.statusBlock}
               onClick={() => {
                 setOpen(true);
+              }}
+              style={{
+                width: "40%",
+                height: "90%",
+                bottom: "41px",
+                marginLeft: "92px",
+                background: "yellow",
               }}
             >
               Rate Applicant
@@ -705,7 +690,12 @@ const AcceptedApplicants = (props) => {
         style={{ padding: "30px", minHeight: "93vh" }}
       >
         <Grid item>
-          <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>Employees</Typography>
+          <Typography
+            variant="h2"
+            style={{ color: "white", fontWeight: "bold" }}
+          >
+            Employees
+          </Typography>
         </Grid>
         <Grid item>
           <IconButton onClick={() => setFilterOpen(true)}>
@@ -729,10 +719,17 @@ const AcceptedApplicants = (props) => {
               </Grid>
             ))
           ) : (
-            <Typography variant="h5" style={{
-              height: "50px", textAlign: "center",
-              background: "rgba(255,255,255,0.5)", marginLeft: "25%", marginRight: "25%", paddingTop: "15px"
-            }}>
+            <Typography
+              variant="h5"
+              style={{
+                height: "50px",
+                textAlign: "center",
+                background: "rgba(255,255,255,0.5)",
+                marginLeft: "25%",
+                marginRight: "25%",
+                paddingTop: "15px",
+              }}
+            >
               No Applications Found
             </Typography>
           )}

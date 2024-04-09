@@ -173,23 +173,22 @@ const Profile = (props) => {
   };
 
 
-  const getResume = () => {
-    const address = `${profileDetails.resume}`;
-    console.log(address)
-    if (address !== "") {
-      window.open(address)
-      // console.log(error);
+  // const getResume = () => {
+  //   const address = `${profileDetails.resume}`;
+  //   console.log(address)
+  //   if (address !== "") {
+  //     window.open(address)
+  //     // console.log(error);
 
-    } else {
-      setPopup({
-        open: true,
-        severity: "error",
-        message: "You have not uploaded any resume. Upload one to view!",
-      });
-    }
+  //   } else {
+  //     setPopup({
+  //       open: true,
+  //       severity: "error",
+  //       message: "You have not uploaded any resume. Upload one to view!",
+  //     });
+  //   }
 
-  }
-
+  // }
 
   const handleClose = () => {
     setOpen(false);
@@ -281,10 +280,6 @@ const Profile = (props) => {
             </Grid>
             <Grid container direction="column" alignItems="" spacing={3}>
 
-              {/* <Grid item >
-              
-            </Grid> */}
-
               <Grid item>
                 <TextField
                   label="Name"
@@ -323,7 +318,7 @@ const Profile = (props) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item>
+              {/* <Grid item>
                 <FileUploadInput
                   className={classes.inputBox}
                   label="Resume (Images only)"
@@ -332,8 +327,8 @@ const Profile = (props) => {
                   handleInput={handleInput}
                   identifier={"resume"}
                 />
-              </Grid>
-              <Grid item>
+              </Grid> */}
+              {/* <Grid item>
                 <Button
                   variant="contained"
                   className={classes.statusBlock}
@@ -343,7 +338,7 @@ const Profile = (props) => {
                 >
                   View Uploaded Resume
                 </Button>
-              </Grid>
+              </Grid> */}
               <Grid item>
                 <FileUploadInput
                   className={classes.inputBox}

@@ -1,7 +1,20 @@
 import { useState, useEffect, useContext } from "react";
 import {
-  Button, Chip, Grid, IconButton, InputAdornment, makeStyles, Paper,
-  TextField, Typography, Modal, Slider, FormControlLabel, FormGroup, MenuItem, Checkbox,
+  Button,
+  Chip,
+  Grid,
+  IconButton,
+  InputAdornment,
+  makeStyles,
+  Paper,
+  TextField,
+  Typography,
+  Modal,
+  Slider,
+  FormControlLabel,
+  FormGroup,
+  MenuItem,
+  Checkbox,
 } from "@material-ui/core";
 import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
@@ -45,6 +58,7 @@ const ApplicationTile = (props) => {
 
   const appliedOn = new Date(application.dateOfApplication);
   const joinedOn = new Date(application.dateOfJoining);
+  const [message, setMessage] = useState("");
 
   const fetchRating = () => {
     axios
@@ -55,7 +69,8 @@ const ApplicationTile = (props) => {
       })
       .then((response) => {
         setRating(response.data.rating);
-        console.log(response.data);
+        setMessage(response.data.message);
+        console.log(response.data.message);
       })
       .catch((err) => {
         // console.log(err.response);
@@ -81,6 +96,7 @@ const ApplicationTile = (props) => {
       )
       .then((response) => {
         console.log(response.data);
+        setMessage(response.data.message);
         setPopup({
           open: true,
           severity: "success",
@@ -88,6 +104,7 @@ const ApplicationTile = (props) => {
         });
         fetchRating();
         setOpen(false);
+        console.log(response.data.message);
       })
       .catch((err) => {
         // console.log(err.response);
@@ -141,7 +158,7 @@ const ApplicationTile = (props) => {
           </Grid>
           <Grid item>Applied On: {appliedOn.toLocaleDateString()}</Grid>
           {application.status === "accepted" ||
-            application.status === "finished" ? (
+          application.status === "finished" ? (
             <Grid item>Joined On: {joinedOn.toLocaleDateString()}</Grid>
           ) : null}
         </Grid>
@@ -152,13 +169,15 @@ const ApplicationTile = (props) => {
               style={{
                 background: colorSet[application.status],
                 color: "#ffffff",
+                width: "66%",
+                height: "40%",
               }}
             >
               {application.status}
             </Paper>
           </Grid>
           {application.status === "accepted" ||
-            application.status === "finished" ? (
+          application.status === "finished" ? (
             <Grid item>
               <Button
                 variant="contained"
@@ -168,13 +187,61 @@ const ApplicationTile = (props) => {
                   fetchRating();
                   setOpen(true);
                 }}
+                style={{
+                  marginTop: "-135px",
+                  marginBottom: "20px",
+                  padding: "20px",
+                  color: "#ffffff",
+                  width: "66%",
+                  height: "40%",
+                }}
               >
                 Rate Job
               </Button>
+
+              <Grid item>
+                <p style={{ fontWeight: "700" }}>Response From Recruiter:</p>
+                <p>
+                  <span
+                    style={{
+                      background: "#f4b347",
+                      padding: "10px 20px",
+                      border: "1px solid white",
+                      borderRadius: "5px",
+                      width: "62 %",
+                      height: "23px",
+                    }}
+                  >
+                    {application.message}
+                  </span>
+                </p>
+              </Grid>
             </Grid>
-          ) : null}
+          ) : (
+            <Grid item>
+              <p style={{ fontWeight: "700" }}>Response From Recruiter:</p>
+              <p>
+                <span
+                  style={{
+                    background: "#f4b347",
+                    padding: "10px 20px",
+                    border: "1px solid white",
+                    borderRadius: "5px",
+                    width: "62 %",
+                    height: "23px",
+                  }}
+                >
+                  {application.message}
+                </span>
+              </p>
+            </Grid>
+          )}
         </Grid>
       </Grid>
+
+      <Typography variant="body1" style={{ marginTop: "10px" }}>
+        {message && `Message: ${message}`}
+      </Typography>
       <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
         <Paper
           style={{
@@ -248,7 +315,9 @@ const Applications = (props) => {
       style={{ padding: "30px", minHeight: "93vh" }}
     >
       <Grid item>
-        <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>Applications</Typography>
+        <Typography variant="h2" style={{ color: "white", fontWeight: "bold" }}>
+          Applications
+        </Typography>
       </Grid>
 
       <Grid
@@ -267,10 +336,17 @@ const Applications = (props) => {
             </Grid>
           ))
         ) : (
-          <Typography variant="h5" style={{
-            height: "50px", textAlign: "center",
-            background: "rgba(255,255,255,0.5)", marginLeft: "25%", marginRight: "25%", paddingTop: "15px"
-          }}>
+          <Typography
+            variant="h5"
+            style={{
+              height: "50px",
+              textAlign: "center",
+              background: "rgba(255,255,255,0.5)",
+              marginLeft: "25%",
+              marginRight: "25%",
+              paddingTop: "15px",
+            }}
+          >
             No Applications Found
           </Typography>
         )}
@@ -280,3 +356,4 @@ const Applications = (props) => {
 };
 
 export default Applications;
+
